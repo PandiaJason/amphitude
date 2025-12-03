@@ -68,6 +68,7 @@ public:
     bool connected = false;
 
     UPnPMapper upnp;
+    bool isUPnPActive = false;
 
     bool init() {
         if (SDLNet_Init() < 0) {
@@ -80,8 +81,10 @@ public:
         std::cout << "Initializing UPnP..." << std::endl;
         if (upnp.init()) {
             std::cout << "UPnP Initialized. External IP: " << upnp.getExternalIP() << std::endl;
+            isUPnPActive = true;
         } else {
             std::cout << "UPnP Initialization Failed (Manual Port Forwarding required)." << std::endl;
+            isUPnPActive = false;
         }
         
         return true;
