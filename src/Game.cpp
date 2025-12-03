@@ -429,6 +429,13 @@ void Game::handleEvents(SDL_Event& event) {
                     p2Ready = false;
                     p1NameInput = "Player 1";
                     p2NameInput = "Player 2";
+                    
+                    // Reset Signaling State
+                    waitingForCode = false;
+                    enteringCode = false;
+                    secretCode = "";
+                    signalingError = "";
+                    connectionFailed = false;
                 }
             }
             else if (currentState == PAUSED) {
