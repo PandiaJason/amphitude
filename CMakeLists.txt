@@ -20,13 +20,7 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(SDL2_net REQUIRED)
 
-# 2. MiniUPnPc (Vendored)
-# We build it as a static library
-option(UPNPC_BUILD_STATIC "Build static library" ON)
-option(UPNPC_BUILD_SHARED "Build shared library" OFF)
-option(UPNPC_BUILD_TESTS "Build tests" OFF)
-option(UPNPC_BUILD_SAMPLE "Build sample" OFF)
-add_subdirectory(vendor/miniupnp/miniupnpc)
+
 
 # --- Game Executable ---
 
@@ -35,7 +29,7 @@ set(SOURCES
     src/Game.cpp
     src/Player.cpp
     src/Utils.cpp
-    src/UPnPMapper.cpp
+
 )
 
 add_executable(amphitude ${SOURCES})
@@ -44,7 +38,7 @@ add_executable(amphitude ${SOURCES})
 target_include_directories(amphitude PRIVATE 
     include
     /opt/homebrew/include
-    # MiniUPnPc adds its own include directories to the target 'libminiupnpc-static'
+
 )
 
 # Link libraries
@@ -53,7 +47,7 @@ target_link_libraries(amphitude PRIVATE
     SDL2_image::SDL2_image
     SDL2_ttf::SDL2_ttf
     SDL2_net::SDL2_net
-    libminiupnpc-static
+
 )
 
 # Copy Assets to Build Directory (for running locally)

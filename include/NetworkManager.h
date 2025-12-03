@@ -4,8 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <thread>
-#include "UPnPMapper.h"
+
 
 
 
@@ -68,9 +67,7 @@ public:
     bool isHost = false;
     bool connected = false;
 
-    UPnPMapper upnp;
-    bool isUPnPActive = false;
-    bool isUPnPInitializing = false;
+
 
     bool init() {
         if (SDLNet_Init() < 0) {
@@ -79,26 +76,13 @@ public:
         }
         socketSet = SDLNet_AllocSocketSet(1); // We only talk to one peer (Client or Host)
         
-        // Init UPnP Asynchronously
-        isUPnPInitializing = true;
-        std::thread([this]() {
-            std::cout << "Initializing UPnP (Async)..." << std::endl;
-            if (upnp.init()) {
-                std::cout << "UPnP Initialized. External IP: " << upnp.getExternalIP() << std::endl;
-                isUPnPActive = true;
-            } else {
-                std::cout << "UPnP Initialization Failed (Manual Port Forwarding required)." << std::endl;
-                isUPnPActive = false;
-            }
-            isUPnPInitializing = false;
-        }).detach();
+
         
         return true;
     }
 
     bool hostGame(int port) {
-        // Try to map port
-        upnp.addPortMapping(port);
+
         
         IPaddress ip;
         if (SDLNet_ResolveHost(&ip, NULL, port) < 0) return false;
@@ -116,9 +100,7 @@ public:
     // ... send/receive ...
 
     void disconnect() {
-        if (isHost) {
-            upnp.removePortMapping(12345); // Assuming default port
-        }
+
         
         if (server) {
             SDLNet_TCP_Close(server);

@@ -85,19 +85,15 @@ cd server
     - Press **Escape** to cancel.
 
 #### Playing Over the Internet 🌍
-The game now supports **Automatic Port Forwarding (UPnP)**! ⚡️
+To play with someone on a different network, you need **Port Forwarding** or a **VPN**.
 
-**Option A: Automatic (Recommended)**
-1.  **Host**: Just press **H**. The game will try to open ports automatically on your router.
-2.  **Client**: Enter the **Secret Code**.
-    - *Note*: If UPnP fails (e.g., on corporate networks), check the console for "UPnP Initialization Failed".
-
-**Option B: Manual Port Forwarding (Fallback)**
-If UPnP doesn't work:
-1.  **Host**: Forward port **12345** (TCP) to your local IP.
+**Option A: Manual Port Forwarding (Recommended)**
+1.  **Host**: Forward port **12345** (TCP) to your local IP in your router settings.
 2.  **Server**: Run the `server_app`.
+3.  **Host**: Press **H** in-game.
+4.  **Client**: Enter the **Secret Code**.
 
-**Option C: VPN (Hamachi/ZeroTier)**
+**Option B: VPN (Hamachi/ZeroTier)**
 1.  Both players join the VPN.
 2.  Host runs `server_app`.
 3.  Game connects using the VPN IP.

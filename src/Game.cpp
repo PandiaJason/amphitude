@@ -1066,13 +1066,7 @@ void Game::render() {
                          renderCenteredText(400, "Share this code with your friend!", {200, 200, 200, 255}, font);
                          renderCenteredText(450, "Waiting for connection...", {255, 255, 0, 255}, font);
                          
-                         if (net.isUPnPInitializing) {
-                             renderCenteredText(500, "UPnP: Initializing... (Background)", {255, 255, 0, 255}, font);
-                         } else if (net.isUPnPActive) {
-                             renderCenteredText(500, "UPnP: Active (Port Open)", {0, 255, 0, 255}, font);
-                         } else {
-                             renderCenteredText(500, "UPnP: Failed (Use Manual Port Forwarding)", {255, 100, 100, 255}, font);
-                         }
+
                     } else if (net.connected) {
                          renderCenteredText(300, "Client Connected! Entering Lobby...", {0, 255, 0, 255}, font);
                     }
