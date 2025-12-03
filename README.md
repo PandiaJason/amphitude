@@ -28,21 +28,32 @@ brew install sdl2 sdl2_image sdl2_ttf sdl2_net
 sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
 ```
 
-### Building the Game
-Clone the repository and run the build script:
+### Building the Game (CMake)
+We use **CMake** for cross-platform builds.
 
+**Prerequisites:**
+-   CMake (3.14+)
+-   SDL2, SDL2_image, SDL2_ttf, SDL2_net (Development libraries)
+
+**Build Steps:**
 ```bash
-git clone https://github.com/PandiaJason/amphitude.git
-cd amphitude
-./build.sh
+mkdir build && cd build
+cmake ..
+cmake --build .
 ```
 
-### Building the Signaling Server (Required for Online Play)
-The game uses a standalone C++ server for matchmaking.
+### Creating Installers 📦
+You can generate an installer for your OS (macOS .dmg, Windows .exe, Linux .deb) by running:
+```bash
+cd build
+cpack
+```
+
+### Building the Signaling Server
+The server is currently built separately:
 ```bash
 cd server
 ./build.sh
-cd ..
 ```
 
 ### Running the Game

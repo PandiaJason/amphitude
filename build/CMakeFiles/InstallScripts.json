@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/admin/amphitude/build/cmake_install.cmake",
+		"/Users/admin/amphitude/build/vendor/miniupnp/miniupnpc/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
