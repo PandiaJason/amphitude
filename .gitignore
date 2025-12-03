@@ -1,0 +1,12 @@
+# Build artifacts
+game
+*.o
+*.dSYM/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
