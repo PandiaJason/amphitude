@@ -74,13 +74,19 @@ cd ..
     - Press **Escape** to cancel.
 
 #### Playing Over the Internet 🌍
-To play with someone on a different network, you still need **Port Forwarding** or a **VPN** because the Signaling Server only exchanges IPs; it does not relay game traffic.
+The game now supports **Automatic Port Forwarding (UPnP)**! ⚡️
 
-**Option A: Port Forwarding (Recommended)**
+**Option A: Automatic (Recommended)**
+1.  **Host**: Just press **H**. The game will try to open ports automatically on your router.
+2.  **Client**: Enter the **Secret Code**.
+    - *Note*: If UPnP fails (e.g., on corporate networks), check the console for "UPnP Initialization Failed".
+
+**Option B: Manual Port Forwarding (Fallback)**
+If UPnP doesn't work:
 1.  **Host**: Forward port **12345** (TCP) to your local IP.
-2.  **Server**: Run the `server_app` on a machine accessible to both players (or the Host can run it if they forward port **8080** too).
+2.  **Server**: Run the `server_app`.
 
-**Option B: VPN (Hamachi/ZeroTier)**
+**Option C: VPN (Hamachi/ZeroTier)**
 1.  Both players join the VPN.
 2.  Host runs `server_app`.
 3.  Game connects using the VPN IP.

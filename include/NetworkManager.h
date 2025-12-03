@@ -4,6 +4,7 @@
 #include <SDL2/SDL_net.h>
 #include <string>
 #include <iostream>
+#include "../include/UPnPMapper.h"
 
 
 
@@ -66,16 +67,30 @@ public:
     bool isHost = false;
     bool connected = false;
 
+    UPnPMapper upnp;
+
     bool init() {
         if (SDLNet_Init() < 0) {
             std::cerr << "SDLNet_Init: " << SDLNet_GetError() << std::endl;
             return false;
         }
         socketSet = SDLNet_AllocSocketSet(1); // We only talk to one peer (Client or Host)
+        
+        // Init UPnP
+        std::cout << "Initializing UPnP..." << std::endl;
+        if (upnp.init()) {
+            std::cout << "UPnP Initialized. External IP: " << upnp.getExternalIP() << std::endl;
+        } else {
+            std::cout << "UPnP Initialization Failed (Manual Port Forwarding required)." << std::endl;
+        }
+        
         return true;
     }
 
     bool hostGame(int port) {
+        // Try to map port
+        upnp.addPortMapping(port);
+        
         IPaddress ip;
         if (SDLNet_ResolveHost(&ip, NULL, port) < 0) return false;
         server = SDLNet_TCP_Open(&ip);
@@ -83,6 +98,33 @@ public:
         isHost = true;
         std::cout << "Hosting on port " << port << "..." << std::endl;
         return true;
+    }
+    
+    // ... joinGame ...
+
+    // ... acceptClient ...
+    
+    // ... send/receive ...
+
+    void disconnect() {
+        if (isHost) {
+            upnp.removePortMapping(12345); // Assuming default port
+        }
+        
+        if (server) {
+            SDLNet_TCP_Close(server);
+            server = nullptr;
+        }
+        if (client) {
+            if (socketSet) SDLNet_TCP_DelSocket(socketSet, client);
+            SDLNet_TCP_Close(client);
+            client = nullptr;
+        }
+        // Do NOT free socketSet here, as we reuse the NetworkManager instance.
+        // It is freed in cleanup().
+        
+        connected = false;
+        isHost = false;
     }
 
     bool joinGame(const std::string& host, int port) {
@@ -138,22 +180,7 @@ public:
         return false;
     }
 
-    void disconnect() {
-        if (server) {
-            SDLNet_TCP_Close(server);
-            server = nullptr;
-        }
-        if (client) {
-            if (socketSet) SDLNet_TCP_DelSocket(socketSet, client);
-            SDLNet_TCP_Close(client);
-            client = nullptr;
-        }
-        // Do NOT free socketSet here, as we reuse the NetworkManager instance.
-        // It is freed in cleanup().
-        
-        connected = false;
-        isHost = false;
-    }
+
 
     // Signaling Server Integration
     std::string requestHostCode(int gamePort) {
