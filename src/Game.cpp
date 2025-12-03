@@ -1048,7 +1048,7 @@ void Game::render() {
                 if (net.isHost) {
                     if (waitingForCode) {
                          renderCenteredText(250, "Hosting Game...", {255, 255, 255, 255}, font);
-                         renderCenteredText(300, "Secret Code: " + secretCode, {0, 255, 0, 255}, titleFont);
+                         renderCenteredText(300, "Secret Code: " + secretCode, {0, 255, 0, 255}, font);
                          renderCenteredText(400, "Share this code with your friend!", {200, 200, 200, 255}, font);
                          renderCenteredText(450, "Waiting for connection...", {255, 255, 0, 255}, font);
                     } else if (net.connected) {
@@ -1057,7 +1057,7 @@ void Game::render() {
                 } else {
                     if (enteringCode) {
                         renderCenteredText(250, "Enter Secret Code:", {255, 255, 255, 255}, font);
-                        renderCenteredText(300, secretCode + "_", {0, 255, 255, 255}, titleFont);
+                        renderCenteredText(300, secretCode + "_", {0, 255, 255, 255}, font);
                         if (!signalingError.empty()) {
                             renderCenteredText(400, signalingError, {255, 0, 0, 255}, font);
                         } else {
