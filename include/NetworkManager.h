@@ -1,10 +1,11 @@
 #ifndef NETWORKMANAGER_H
 #define NETWORKMANAGER_H
-
 #include <SDL2/SDL_net.h>
-#include <string>
 #include <iostream>
-#include "../include/UPnPMapper.h"
+#include <string>
+#include <vector>
+#include <thread>
+#include "UPnPMapper.h"
 
 
 
@@ -69,6 +70,7 @@ public:
 
     UPnPMapper upnp;
     bool isUPnPActive = false;
+    bool isUPnPInitializing = false;
 
     bool init() {
         if (SDLNet_Init() < 0) {
@@ -77,15 +79,19 @@ public:
         }
         socketSet = SDLNet_AllocSocketSet(1); // We only talk to one peer (Client or Host)
         
-        // Init UPnP
-        std::cout << "Initializing UPnP..." << std::endl;
-        if (upnp.init()) {
-            std::cout << "UPnP Initialized. External IP: " << upnp.getExternalIP() << std::endl;
-            isUPnPActive = true;
-        } else {
-            std::cout << "UPnP Initialization Failed (Manual Port Forwarding required)." << std::endl;
-            isUPnPActive = false;
-        }
+        // Init UPnP Asynchronously
+        isUPnPInitializing = true;
+        std::thread([this]() {
+            std::cout << "Initializing UPnP (Async)..." << std::endl;
+            if (upnp.init()) {
+                std::cout << "UPnP Initialized. External IP: " << upnp.getExternalIP() << std::endl;
+                isUPnPActive = true;
+            } else {
+                std::cout << "UPnP Initialization Failed (Manual Port Forwarding required)." << std::endl;
+                isUPnPActive = false;
+            }
+            isUPnPInitializing = false;
+        }).detach();
         
         return true;
     }
