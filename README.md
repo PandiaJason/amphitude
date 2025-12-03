@@ -1,6 +1,6 @@
-# Amphitude 🌍⚔️
+# amphitude 
 
-**Amphitude** is an open-source, 2D multiplayer platformer battle game built with C++ and SDL2. It features real-time online multiplayer, pixel-art graphics, and fast-paced combat.
+**amphitude** is an open-source, 2D multiplayer platformer battle game built with C++ and SDL2. It features real-time online multiplayer, pixel-art graphics, and fast-paced combat.
 
 ![License](https://img.shields.io/badge/license-GPLv2-blue.svg)
 ![Language](https://img.shields.io/badge/language-C%2B%2B-blue.svg)
@@ -53,15 +53,21 @@ This will compile the source code and generate an executable named `game`.
 | **Jump** | W | Up Arrow |
 | **Attack** | F | Enter |
 | **Pause** | Escape | Escape |
+| **Forfeit** | Y (in Pause Menu) | Y (in Pause Menu) |
 
 ### Online Multiplayer
 1.  **Host**: Select **Host (H)** in the main menu. Wait for a player to join.
+    - Press **Escape** to cancel and return to the main menu.
 2.  **Join**: Select **Join (J)**. Enter the Host's IP address (default `127.0.0.1` for local testing) and press Enter.
+    - Press **Escape** to cancel and return to the main menu.
 3.  **Lobby**:
     - Press **T** to type your name.
     - Press **1** (P1) or **2** (P2) to switch characters.
     - Press **Enter** to toggle **Ready**.
+    - Press **Escape** to disconnect and return to the main menu.
     - The game starts when both players are Ready.
+4.  **Game Over**:
+    - Press **Space** or **Escape** to return to the main menu.
 
 ## 👨‍💻 Developer Documentation
 
