@@ -805,6 +805,13 @@ void Game::update() {
                      net.disconnect();
                      p1Ready = false;
                      p2Ready = false;
+                     
+                     // Reset Signaling State
+                     waitingForCode = false;
+                     enteringCode = false;
+                     secretCode = "";
+                     signalingError = "";
+                     connectionFailed = false;
                 }
             }
         } else {
