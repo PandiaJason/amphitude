@@ -37,12 +37,24 @@ cd amphitude
 ./build.sh
 ```
 
-This will compile the source code and generate an executable named `game`.
+### Building the Signaling Server (Required for Online Play)
+The game uses a standalone C++ server for matchmaking.
+```bash
+cd server
+./build.sh
+cd ..
+```
 
 ### Running the Game
-```bash
-./game
-```
+1.  **Start the Server** (in one terminal):
+    ```bash
+    cd server
+    ./server_app
+    ```
+2.  **Start the Game** (in another terminal):
+    ```bash
+    ./game
+    ```
 
 ## 🕹️ How to Play
 
@@ -56,24 +68,22 @@ This will compile the source code and generate an executable named `game`.
 | **Forfeit** | Y (in Pause Menu) | Y (in Pause Menu) |
 
 ### Online Multiplayer
-1.  **Host**: Select **Host (H)** in the main menu. Wait for a player to join.
-    - Press **Escape** to cancel and return to the main menu.
-2.  **Join**: Select **Join (J)**. Enter the Host's IP address (default `127.0.0.1` for local testing) and press Enter.
-    - Press **Escape** to cancel and return to the main menu.
+1.  **Host**: Select **Host (H)**. The game will generate a **Secret Code** (e.g., `X7Z29A`). Share this with your friend.
+    - Press **Escape** to cancel.
+2.  **Join**: Select **Join (J)**. Enter the **Secret Code** and press **Enter**.
+    - Press **Escape** to cancel.
 
 #### Playing Over the Internet 🌍
-To play with someone on a different network, you have two options:
+To play with someone on a different network, you still need **Port Forwarding** or a **VPN** because the Signaling Server only exchanges IPs; it does not relay game traffic.
 
-**Option A: Port Forwarding (Recommended for Speed)**
-1.  **Host**: Log into your router and forward port **12345** (TCP) to your computer's local IP.
-2.  **Host**: Find your **Public IP** (search "what is my ip" on Google).
-3.  **Client**: Enter the Host's **Public IP** in the Join menu.
+**Option A: Port Forwarding (Recommended)**
+1.  **Host**: Forward port **12345** (TCP) to your local IP.
+2.  **Server**: Run the `server_app` on a machine accessible to both players (or the Host can run it if they forward port **8080** too).
 
-**Option B: VPN / Tunneling (Easier)**
-Use a tool like **Hamachi**, **ZeroTier**, or **Ngrok** to create a virtual local network.
-1.  Both players install the tool and join the same network.
-2.  **Host**: Hosts the game as usual.
-3.  **Client**: Enters the Host's **VPN IP Address** (provided by the tool).
+**Option B: VPN (Hamachi/ZeroTier)**
+1.  Both players join the VPN.
+2.  Host runs `server_app`.
+3.  Game connects using the VPN IP.
 3.  **Lobby**:
     - Press **T** to type your name.
     - Press **1** (P1) or **2** (P2) to switch characters.

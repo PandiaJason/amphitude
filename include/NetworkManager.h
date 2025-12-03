@@ -155,6 +155,53 @@ public:
         isHost = false;
     }
 
+    // Signaling Server Integration
+    std::string requestHostCode(int gamePort) {
+        IPaddress ip;
+        if (SDLNet_ResolveHost(&ip, "127.0.0.1", 8080) < 0) return "";
+        TCPsocket sock = SDLNet_TCP_Open(&ip);
+        if (!sock) return "";
+
+        std::string msg = "HOST " + std::to_string(gamePort);
+        SDLNet_TCP_Send(sock, msg.c_str(), msg.length() + 1);
+
+        char buffer[1024];
+        int len = SDLNet_TCP_Recv(sock, buffer, 1024);
+        SDLNet_TCP_Close(sock);
+
+        if (len > 0) {
+            buffer[len] = '\0';
+            std::string response(buffer);
+            if (response.rfind("CODE", 0) == 0) {
+                return response.substr(5);
+            }
+        }
+        return "";
+    }
+
+    std::string resolveJoinCode(const std::string& code) {
+        IPaddress ip;
+        if (SDLNet_ResolveHost(&ip, "127.0.0.1", 8080) < 0) return "";
+        TCPsocket sock = SDLNet_TCP_Open(&ip);
+        if (!sock) return "";
+
+        std::string msg = "JOIN " + code;
+        SDLNet_TCP_Send(sock, msg.c_str(), msg.length() + 1);
+
+        char buffer[1024];
+        int len = SDLNet_TCP_Recv(sock, buffer, 1024);
+        SDLNet_TCP_Close(sock);
+
+        if (len > 0) {
+            buffer[len] = '\0';
+            std::string response(buffer);
+            if (response.rfind("ADDR", 0) == 0) {
+                return response.substr(5); // Returns "IP PORT"
+            }
+        }
+        return "";
+    }
+
     void cleanup() {
         disconnect();
         if (socketSet) {

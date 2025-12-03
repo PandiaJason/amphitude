@@ -208,8 +208,10 @@ void Game::handleEvents(SDL_Event& event) {
             if (ignoreInputFrames > 0) {
                 // Ignore input
             }
-            else if (currentState == MENU || (currentState == MENU && connectionFailed)) {
-                ipInput += event.text.text;
+            else if (currentState == MENU) {
+                if (enteringCode) {
+                    secretCode += event.text.text;
+                }
             }
             else if (currentState == CHARACTER_SELECT && typingName) {
                 if (!isOnline || net.isHost) {
@@ -228,13 +230,22 @@ void Game::handleEvents(SDL_Event& event) {
                 if (!isOnline) {
                     if (event.key.keysym.sym == SDLK_h) {
                         isOnline = true;
-                        net.hostGame(12345);
+                        // Request Code from Signaling Server
+                        secretCode = net.requestHostCode(12345);
+                        if (secretCode.empty()) {
+                            signalingError = "Failed to reach Signaling Server";
+                            isOnline = false;
+                        } else {
+                            net.hostGame(12345);
+                            waitingForCode = true; // Waiting for client to join via code
+                        }
                     }
                     if (event.key.keysym.sym == SDLK_j) {
                         isOnline = true;
-                        // ipInput = ""; // Keep default for convenience
+                        enteringCode = true;
+                        secretCode = "";
                         SDL_StartTextInput();
-                        ignoreInputFrames = 2; // Prevent 'j' from being typed
+                        ignoreInputFrames = 2;
                     }
                     if (event.key.keysym.sym == SDLK_l) {
                         // Local Game
@@ -243,33 +254,50 @@ void Game::handleEvents(SDL_Event& event) {
                 } else {
                     // Online Menu
                     if (net.isHost) {
-                        if (net.connected) {
-                             // Transition handled in update() now
-                        }
+                         // Host Waiting Logic (Handled in update)
+                         if (event.key.keysym.sym == SDLK_ESCAPE) {
+                             net.disconnect();
+                             isOnline = false;
+                             waitingForCode = false;
+                         }
                     } else {
-                        // Client
-                        if (event.key.keysym.sym == SDLK_RETURN) {
-                            SDL_StopTextInput();
-                            if (net.joinGame(ipInput, 12345)) {
-                                currentState = CHARACTER_SELECT;
-                                connectionFailed = false;
-                            } else {
-                                connectionFailed = true;
-                                SDL_StartTextInput(); // Keep typing
+                        // Client Entering Code
+                        if (enteringCode) {
+                            if (event.key.keysym.sym == SDLK_RETURN) {
+                                SDL_StopTextInput();
+                                std::string addr = net.resolveJoinCode(secretCode);
+                                if (addr.empty()) {
+                                    signalingError = "Invalid or Expired Code";
+                                    // Stay in menu to retry
+                                } else {
+                                    // Parse IP and Port
+                                    size_t spacePos = addr.find(' ');
+                                    if (spacePos != std::string::npos) {
+                                        std::string ip = addr.substr(0, spacePos);
+                                        int port = std::stoi(addr.substr(spacePos + 1));
+                                        
+                                        if (net.joinGame(ip, port)) {
+                                            currentState = CHARACTER_SELECT;
+                                            connectionFailed = false;
+                                            enteringCode = false;
+                                        } else {
+                                            connectionFailed = true;
+                                            signalingError = "Connection Failed";
+                                            SDL_StartTextInput();
+                                        }
+                                    }
+                                }
+                            }
+                            if (event.key.keysym.sym == SDLK_BACKSPACE && secretCode.length() > 0) {
+                                secretCode.pop_back();
+                            }
+                            if (event.key.keysym.sym == SDLK_ESCAPE) {
+                                SDL_StopTextInput();
+                                isOnline = false;
+                                enteringCode = false;
+                                signalingError = "";
                             }
                         }
-                        if (event.key.keysym.sym == SDLK_BACKSPACE && ipInput.length() > 0) {
-                            ipInput.pop_back();
-                            connectionFailed = false; // Reset on edit
-                        }
-                    }
-                    
-                    // Cancel / Back
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        SDL_StopTextInput();
-                        net.disconnect();
-                        isOnline = false;
-                        connectionFailed = false;
                     }
                 }
             }
@@ -1013,20 +1041,28 @@ void Game::render() {
                 renderCenteredText(250, "Press H to HOST Game", {255, 255, 255, 255}, font);
                 renderCenteredText(300, "Press J to JOIN Game", {255, 255, 255, 255}, font);
                 renderCenteredText(350, "Press L for LOCAL Game", {200, 200, 200, 255}, font);
+                if (!signalingError.empty()) {
+                    renderCenteredText(450, signalingError, {255, 0, 0, 255}, font);
+                }
             } else {
                 if (net.isHost) {
-                    if (net.connected) {
+                    if (waitingForCode) {
+                         renderCenteredText(250, "Hosting Game...", {255, 255, 255, 255}, font);
+                         renderCenteredText(300, "Secret Code: " + secretCode, {0, 255, 0, 255}, titleFont);
+                         renderCenteredText(400, "Share this code with your friend!", {200, 200, 200, 255}, font);
+                         renderCenteredText(450, "Waiting for connection...", {255, 255, 0, 255}, font);
+                    } else if (net.connected) {
                          renderCenteredText(300, "Client Connected! Entering Lobby...", {0, 255, 0, 255}, font);
-                    } else {
-                         renderCenteredText(300, "Waiting for Client...", {255, 255, 0, 255}, font);
                     }
                 } else {
-                    renderCenteredText(250, "Enter Host IP:", {255, 255, 255, 255}, font);
-                    renderCenteredText(300, ipInput + "_", {0, 255, 255, 255}, font);
-                    if (connectionFailed) {
-                        renderCenteredText(400, "Connection Failed!", {255, 0, 0, 255}, font);
-                    } else {
-                        renderCenteredText(350, "Press ENTER to Connect", {200, 200, 200, 255}, font);
+                    if (enteringCode) {
+                        renderCenteredText(250, "Enter Secret Code:", {255, 255, 255, 255}, font);
+                        renderCenteredText(300, secretCode + "_", {0, 255, 255, 255}, titleFont);
+                        if (!signalingError.empty()) {
+                            renderCenteredText(400, signalingError, {255, 0, 0, 255}, font);
+                        } else {
+                            renderCenteredText(350, "Press ENTER to Connect", {200, 200, 200, 255}, font);
+                        }
                     }
                 }
             }
