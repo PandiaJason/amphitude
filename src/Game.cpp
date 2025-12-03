@@ -56,7 +56,8 @@ bool Game::init() {
 
 void Game::run() {
     SDL_Event event;
-    while (running) {
+    // Main Game Loop using for(;;) as requested for industry standard flow
+    for (; running; ) {
         Uint32 frameStart = SDL_GetTicks();
         // Network Handshake
         if (isOnline && !net.connected) {
@@ -192,6 +193,7 @@ void Game::resetGame() {
     lastPowerUpTime = SDL_GetTicks();
     
     gameTime = GameConstants::GAME_DURATION;
+    winnerId = 0;
 }
 
 void Game::spawnPowerUps() {
@@ -199,10 +201,14 @@ void Game::spawnPowerUps() {
 }
 
 void Game::handleEvents(SDL_Event& event) {
-    while (SDL_PollEvent(&event)) {
+    // Poll events using for(;;) loop
+    for (; SDL_PollEvent(&event); ) {
         if (event.type == SDL_QUIT) running = false;
         else if (event.type == SDL_TEXTINPUT) {
-            if (currentState == MENU || (currentState == MENU && connectionFailed)) {
+            if (ignoreInputFrames > 0) {
+                // Ignore input
+            }
+            else if (currentState == MENU || (currentState == MENU && connectionFailed)) {
                 ipInput += event.text.text;
             }
             else if (currentState == CHARACTER_SELECT && typingName) {
@@ -228,6 +234,7 @@ void Game::handleEvents(SDL_Event& event) {
                         isOnline = true;
                         // ipInput = ""; // Keep default for convenience
                         SDL_StartTextInput();
+                        ignoreInputFrames = 2; // Prevent 'j' from being typed
                     }
                     if (event.key.keysym.sym == SDLK_l) {
                         // Local Game
@@ -255,6 +262,14 @@ void Game::handleEvents(SDL_Event& event) {
                             ipInput.pop_back();
                             connectionFailed = false; // Reset on edit
                         }
+                    }
+                    
+                    // Cancel / Back
+                    if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        SDL_StopTextInput();
+                        net.disconnect();
+                        isOnline = false;
+                        connectionFailed = false;
                     }
                 }
             }
@@ -427,6 +442,8 @@ void Game::handleEvents(SDL_Event& event) {
 
 
 void Game::update() {
+    if (ignoreInputFrames > 0) ignoreInputFrames--;
+
     // Auto-transition Host to Lobby
     if (currentState == MENU && isOnline && net.isHost && net.connected) {
         SDL_Delay(500); // Brief delay to see "Connected" message
@@ -464,7 +481,8 @@ void Game::update() {
 
                 // Receive P2 choice, Name, Ready Status
                 Packet p2P;
-                while (net.receive(p2P)) {
+                // Process all incoming packets
+                for (; net.receive(p2P); ) {
                     if (p2P.type == 2) {
                         p2Character = p2P.p2Char;
                         p2NameInput = p2P.p2Name;
@@ -498,7 +516,7 @@ void Game::update() {
 
                 // Receive P1 choice, Name, Ready Status
                 Packet hostP;
-                while (net.receive(hostP)) {
+                for (; net.receive(hostP); ) {
                     if (hostP.type == 2) {
                         p1Character = hostP.p1Char;
                         p1NameInput = hostP.p1Name;
@@ -542,7 +560,7 @@ void Game::update() {
                 Packet p2Input;
                 // Drain the socket to get the LATEST input packet
                 // This prevents input lag if packets pile up in the buffer
-                while (net.receive(p2Input)) {
+                for (; net.receive(p2Input); ) {
                     if (p2Input.type == 1) {
                         // Apply P2 Input
                         players[1].keyLeft = p2Input.keys[0]; // Left
@@ -631,7 +649,7 @@ void Game::update() {
 
                 Packet hostState;
                 // Drain socket to get LATEST state
-                while (net.receive(hostState)) {
+                for (; net.receive(hostState); ) {
                     if (hostState.type == 2) { // Assuming type 2 is game state
                         // Check for State Change (e.g. Back to Lobby)
                         if (hostState.gameState == CHARACTER_SELECT) {
@@ -699,41 +717,69 @@ void Game::update() {
                         // Sync Game State
                         if (hostState.gameState == GAMEOVER) {
                             currentState = GAMEOVER;
+                            winnerId = hostState.winnerId;
                         }
                     }
                 }
             }
         }
     }
-    
-    // Add GAMEOVER Sync Block
-    if (currentState == GAMEOVER && isOnline) {
-         if (net.isHost) {
-             // Host keeps sending Game Over state so Client knows
-             Packet stateP;
-             stateP.type = 2;
-             stateP.gameState = GAMEOVER;
-             // We can send dummy data or last known state
-             // Important: Send winnerId
-             if (players[0].hp <= 0) stateP.winnerId = 2;
-             else if (players[1].hp <= 0) stateP.winnerId = 1;
-             else stateP.winnerId = 0;
-             
-             net.send(stateP);
-         } else {
-             // Client listens for state change (Back to Lobby)
-             Packet p;
-             while (net.receive(p)) {
-                 if (p.type == 2) {
-                     if (p.gameState == CHARACTER_SELECT) {
-                         currentState = CHARACTER_SELECT;
-                         p1Ready = false;
-                         p2Ready = false;
-                     }
-                 }
-             }
-         }
+    else if (currentState == GAMEOVER) {
+        if (isOnline) {
+            if (net.isHost) {
+                // HOST: Continue sending Game Over state so Client knows
+                Packet stateP;
+                stateP.type = 2; // Game State
+                stateP.gameTime = gameTime;
+                stateP.gameState = GAMEOVER;
+                
+                // Ensure winner is consistent
+                if (players[0].hp <= 0) winnerId = 2;
+                else if (players[1].hp <= 0) winnerId = 1;
+                // If forfeit, winnerId should have been set in handleEvents. 
+                // If not set (0), check HP. If still 0, maybe draw?
+                // But handleEvents sets HP to 0 for quitter.
+                
+                stateP.winnerId = winnerId;
+
+                // Sync HP too just in case
+                stateP.p1HP = players[0].hp;
+                stateP.p2HP = players[1].hp;
+                
+                net.send(stateP);
+            } else {
+                // Client listens for state change (Back to Lobby)
+                Packet p;
+                for (; net.receive(p); ) {
+                    if (p.type == 2) {
+                        if (p.gameState == CHARACTER_SELECT) {
+                            currentState = CHARACTER_SELECT;
+                            p1Ready = false;
+                            p2Ready = false;
+                        }
+                        // Update HP/Winner if we missed it?
+                        players[0].hp = p.p1HP;
+                        players[1].hp = p.p2HP;
+                        if (p.gameState == GAMEOVER) {
+                             winnerId = p.winnerId;
+                        }
+                    }
+                }
+                if (!net.connected) {
+                     currentState = MENU;
+                     net.disconnect();
+                     p1Ready = false;
+                     p2Ready = false;
+                }
+            }
+        } else {
+             // Local Game Over Logic
+             if (players[0].hp <= 0) winnerId = 2;
+             else if (players[1].hp <= 0) winnerId = 1;
+        }
     }
+    
+
 
     if (currentState == PAUSED) {
         pauseTime -= 1.0f / 60.0f;
@@ -1126,8 +1172,8 @@ void Game::render() {
         
         if (font) {
             std::string winner;
-            if (players[0].hp > players[1].hp) winner = players[0].name + " Wins!";
-            else if (players[1].hp > players[0].hp) winner = players[1].name + " Wins!";
+            if (winnerId == 1) winner = players[0].name + " Wins!";
+            else if (winnerId == 2) winner = players[1].name + " Wins!";
             else winner = "It's a Draw!";
             
             renderCenteredText(300, winner, {255, 255, 255, 255}, font);
@@ -1180,4 +1226,5 @@ void Game::cleanup() {
     IMG_Quit();
     TTF_Quit();
     SDL_Quit();
+    net.cleanup();
 }

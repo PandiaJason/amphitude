@@ -59,7 +59,7 @@ void drawCircle(SDL_Renderer* renderer, int cx, int cy, int radius, SDL_Color co
     int y = 0;
     int err = 0;
 
-    while (x >= y) {
+    for (; x >= y; ) {
         // Draw 8 octants
         SDL_RenderDrawLine(renderer, cx - x, cy + y, cx + x, cy + y);
         SDL_RenderDrawLine(renderer, cx - x, cy - y, cx + x, cy - y);

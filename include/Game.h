@@ -83,6 +83,8 @@ private:
     // Name Input
     std::string inputText;
     bool inputtingP1;
+    int winnerId = 0; // 0 = None/Draw, 1 = P1, 2 = P2
+    int ignoreInputFrames = 0; // To prevent immediate key capture
 
 
     // Timer

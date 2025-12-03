@@ -157,6 +157,10 @@ public:
 
     void cleanup() {
         disconnect();
+        if (socketSet) {
+            SDLNet_FreeSocketSet(socketSet);
+            socketSet = nullptr;
+        }
         SDLNet_Quit();
     }
 };
