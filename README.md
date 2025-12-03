@@ -60,6 +60,20 @@ This will compile the source code and generate an executable named `game`.
     - Press **Escape** to cancel and return to the main menu.
 2.  **Join**: Select **Join (J)**. Enter the Host's IP address (default `127.0.0.1` for local testing) and press Enter.
     - Press **Escape** to cancel and return to the main menu.
+
+#### Playing Over the Internet 🌍
+To play with someone on a different network, you have two options:
+
+**Option A: Port Forwarding (Recommended for Speed)**
+1.  **Host**: Log into your router and forward port **12345** (TCP) to your computer's local IP.
+2.  **Host**: Find your **Public IP** (search "what is my ip" on Google).
+3.  **Client**: Enter the Host's **Public IP** in the Join menu.
+
+**Option B: VPN / Tunneling (Easier)**
+Use a tool like **Hamachi**, **ZeroTier**, or **Ngrok** to create a virtual local network.
+1.  Both players install the tool and join the same network.
+2.  **Host**: Hosts the game as usual.
+3.  **Client**: Enters the Host's **VPN IP Address** (provided by the tool).
 3.  **Lobby**:
     - Press **T** to type your name.
     - Press **1** (P1) or **2** (P2) to switch characters.
