@@ -80,8 +80,7 @@ Once dependencies are installed, building is easy!
 | :--- | :--- | :--- |
 | **Move** | `W`, `A`, `S`, `D` | `Arrow Keys` |
 | **Jump** | `W` (Double Jump) | `Up Arrow` (Double Jump) |
-| **Attack** | `Space` | `Enter` |
-| **Ability** | `E` | `/` |
+| **Attack** | `F` | `Enter` |
 | **Pause** | `Esc` | `Esc` |
 
 **Menu Shortcuts:**
