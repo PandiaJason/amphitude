@@ -100,6 +100,41 @@ Amphitude uses a **Signaling Server** to exchange connection details via simple 
 
 ---
 
+## 🌍 How to Play Online (Free VPN Method)
+
+We recommend **ZeroTier** for free, easy online play without port forwarding.
+
+### 1. Setup ZeroTier 🛡️
+1.  **Create a Network**: Go to [ZeroTier Central](https://my.zerotier.com/), create an account, and create a "Network". Copy the **Network ID**.
+2.  **Install App**: Download and install the **ZeroTier One** app on both computers.
+3.  **Join Network**:
+    *   **Option A (App)**: Open the app, click "Join Network", and paste the **Network ID**.
+    *   **Option B (Terminal)**:
+        ```bash
+        sudo zerotier-cli join <NETWORK_ID>
+        ```
+4.  **Authorize Members** (Crucial Step!):
+    *   **Find Your Device ID**:
+        *   **App**: Click the ZeroTier icon in the menu bar.
+        *   **Terminal**: Run `sudo zerotier-cli info` (The 10-character code is your ID).
+    *   Go back to the ZeroTier website (Network settings).
+    *   Scroll down to the "Members" section.
+    *   **Check the box** under "Auth?" for your device ID.
+    *   Wait a moment until you see a **Managed IP** (e.g., `10.147.x.x`).
+
+### 2. Play the Game 🎮
+1.  **Host**:
+    *   Run `./server_app` and `./amphitude`.
+    *   In the Game Menu, press **S** and type your **ZeroTier Managed IP**.
+    *   Press **H** to Host.
+    *   Share the **Secret Code** with your friend.
+2.  **Client**:
+    *   Run `./amphitude`.
+    *   Press **S** and type the **Host's ZeroTier Managed IP**.
+    *   Press **J** and enter the Secret Code.
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions from the community!
