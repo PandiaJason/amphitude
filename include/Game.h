@@ -24,7 +24,7 @@
 class Game {
 public:
     /** @brief Game states */
-    enum GameState { MENU, CHARACTER_SELECT, NAME_INPUT, PLAYING, PAUSED, GAMEOVER, EXIT_CONFIRM };
+    enum GameState { MENU, CHARACTER_SELECT, NAME_INPUT, PLAYING, PAUSED, GAMEOVER, EXIT_CONFIRM, SERVER_IP_INPUT };
 
     Game();
     ~Game();

@@ -66,8 +66,11 @@ public:
     SDLNet_SocketSet socketSet = nullptr; // Socket Set for non-blocking
     bool isHost = false;
     bool connected = false;
+    std::string serverIP = "127.0.0.1"; // Default to localhost
 
-
+    void setSignalingServer(const std::string& ip) {
+        serverIP = ip;
+    }
 
     bool init() {
         if (SDLNet_Init() < 0) {
@@ -178,7 +181,7 @@ public:
     // Signaling Server Integration
     std::string requestHostCode(int gamePort) {
         IPaddress ip;
-        if (SDLNet_ResolveHost(&ip, "127.0.0.1", 8080) < 0) return "";
+        if (SDLNet_ResolveHost(&ip, serverIP.c_str(), 8080) < 0) return "";
         TCPsocket sock = SDLNet_TCP_Open(&ip);
         if (!sock) return "";
 
@@ -201,7 +204,7 @@ public:
 
     std::string resolveJoinCode(const std::string& code) {
         IPaddress ip;
-        if (SDLNet_ResolveHost(&ip, "127.0.0.1", 8080) < 0) return "";
+        if (SDLNet_ResolveHost(&ip, serverIP.c_str(), 8080) < 0) return "";
         TCPsocket sock = SDLNet_TCP_Open(&ip);
         if (!sock) return "";
 
@@ -216,7 +219,18 @@ public:
             buffer[len] = '\0';
             std::string response(buffer);
             if (response.rfind("ADDR", 0) == 0) {
-                return response.substr(5); // Returns "IP PORT"
+                std::string addr = response.substr(5); // "IP PORT"
+                // Localhost Swap Logic for VPNs
+                // If the Host is on the same machine as the Signaling Server (common in VPN setup),
+                // the Signaling Server sees "127.0.0.1".
+                // But the Client needs to connect to the Signaling Server's VPN IP.
+                if (addr.rfind("127.0.0.1", 0) == 0 || addr.rfind("localhost", 0) == 0) {
+                    size_t space = addr.find(' ');
+                    if (space != std::string::npos) {
+                        return serverIP + addr.substr(space);
+                    }
+                }
+                return addr;
             }
         }
         return "";

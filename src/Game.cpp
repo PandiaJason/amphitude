@@ -223,6 +223,9 @@ void Game::handleEvents(SDL_Event& event) {
             else if (currentState == NAME_INPUT) {
                 inputText += event.text.text;
             }
+            else if (currentState == SERVER_IP_INPUT) {
+                inputText += event.text.text;
+            }
         }
         
         if (event.type == SDL_KEYDOWN) {
@@ -259,6 +262,11 @@ void Game::handleEvents(SDL_Event& event) {
                     }
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
                         currentState = EXIT_CONFIRM;
+                    }
+                    if (event.key.keysym.sym == SDLK_s) {
+                        currentState = SERVER_IP_INPUT;
+                        SDL_StartTextInput();
+                        inputText = ipInput; // Pre-fill with current
                     }
                 } else {
                     // Online Menu
@@ -436,6 +444,21 @@ void Game::handleEvents(SDL_Event& event) {
                     running = false;
                 }
                 if (event.key.keysym.sym == SDLK_n || event.key.keysym.sym == SDLK_ESCAPE) {
+                    currentState = MENU;
+                }
+            }
+            else if (currentState == SERVER_IP_INPUT) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    ipInput = inputText;
+                    net.setSignalingServer(ipInput);
+                    SDL_StopTextInput();
+                    currentState = MENU;
+                }
+                if (event.key.keysym.sym == SDLK_BACKSPACE && inputText.length() > 0) {
+                    inputText.pop_back();
+                }
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    SDL_StopTextInput();
                     currentState = MENU;
                 }
             }
@@ -1132,6 +1155,7 @@ void Game::render() {
                 renderCenteredText(250, "Press H to HOST Game", {255, 255, 255, 255}, font);
                 renderCenteredText(300, "Press J to JOIN Game", {255, 255, 255, 255}, font);
                 renderCenteredText(350, "Press L for LOCAL Game", {200, 200, 200, 255}, font);
+                renderCenteredText(400, "Press S to Set Server IP", {100, 100, 100, 255}, font);
                 if (!signalingError.empty()) {
                     renderCenteredText(450, signalingError, {255, 0, 0, 255}, font);
                 }
@@ -1165,6 +1189,14 @@ void Game::render() {
         if (font) {
             renderCenteredText(250, "Quitting...", {255, 255, 255, 255}, font);
             renderCenteredText(350, "Are you sure? (Y/N)", {255, 0, 0, 255}, font);
+        }
+    }
+    else if (currentState == SERVER_IP_INPUT) {
+        if (font) {
+            renderCenteredText(200, "Signaling Server IP", {255, 255, 255, 255}, font);
+            renderCenteredText(250, "(Default: 127.0.0.1)", {150, 150, 150, 255}, font);
+            renderCenteredText(300, inputText + "_", {0, 255, 255, 255}, font);
+            renderCenteredText(400, "Press ENTER to Save", {200, 200, 200, 255}, font);
         }
     }
     else if (currentState == CHARACTER_SELECT) {
