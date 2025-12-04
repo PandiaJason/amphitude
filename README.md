@@ -103,16 +103,27 @@
 
 ---
 
-## 🌐 Online Play (Manual Port Forwarding)
+## 🌐 Online Play
 
-Amphitude uses a direct peer-to-peer connection. To host a game online:
+Amphitude uses a **Signaling Server** to exchange connection details via simple codes.
 
-1.  **Port Forwarding**: Log into your router and forward **Port 12345 (TCP)** to your computer's local IP address.
-2.  **Host**: Launch the game and press **H**.
-3.  **Share IP**: Google "what is my ip" and send that Public IP to your friend.
-4.  **Join**: Your friend launches the game, presses **J**, enters your Public IP, and presses **Enter**.
+1.  **Start the Server**:
+    *   Open a terminal in the `build` folder.
+    *   Run `./server_app`.
+    *   Keep this terminal open!
 
-*Note: If you cannot port forward, you can use a VPN service like Hamachi or ZeroTier to create a virtual LAN.*
+2.  **Host a Game**:
+    *   Run `./amphitude`.
+    *   Press **H**.
+    *   The game will generate a **Code** (e.g., `X7Z29A`).
+    *   Share this code with your friend.
+
+3.  **Join a Game**:
+    *   Run `./amphitude`.
+    *   Press **J**.
+    *   Enter the **Code** and press **Enter**.
+
+*Note: For play over the internet, both players must be able to reach the Signaling Server. Currently, it defaults to `localhost` for testing.*
 
 ---
 
