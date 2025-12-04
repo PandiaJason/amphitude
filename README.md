@@ -14,8 +14,8 @@
 *   **Intense PvP Combat**: Battle your friends in 1v1 duels.
 *   **Local & Online**: Play on the same keyboard or connect over the internet.
 *   **Unique Characters**:
-    *   **Raju**: A balanced fighter who commands fire.
-    *   **Priya**: A swift agile warrior with lightning-fast dashes.
+    *   **Xeno**: A Playable Character -> Male.
+    *   **Zeni**: A Playable Character -> Female.
 *   **Dynamic Physics**: Master double jumps, wall jumps, and momentum-based movement.
 *   **Power-Ups**: Turn the tide with random spawns like **Health Packs**, **Speed Boosts**, and **Shields**.
 
