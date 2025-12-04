@@ -17,7 +17,7 @@
     *   **Xeno**: A Playable Character -> Male.
     *   **Zeni**: A Playable Character -> Female.
 *   **Dynamic Physics**: Master double jumps, wall jumps, and momentum-based movement.
-*   **Power-Ups**: Turn the tide with random spawns like **Health Packs**, **Speed Boosts**, and **Shields**.
+*   **Power-Ups**: Turn the tide with random spawns like **Health Packs**, **Dragon Suit which can fire**, and **Rhino Suit which can 2x damage**.
 
 ### 🛠️ Technical
 *   **Custom Engine**: Built on top of SDL2 for maximum performance and control.
