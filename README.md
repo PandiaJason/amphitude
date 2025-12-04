@@ -1,126 +1,133 @@
-# amphitude 
+# Amphitude ⚔️
 
-**amphitude** is an open-source, 2D multiplayer platformer battle game built with C++ and SDL2. It features real-time online multiplayer, pixel-art graphics, and fast-paced combat.
+**Amphitude** is a high-octane, 2D multiplayer platform fighter built from scratch with C++ and SDL2. It blends retro pixel-art aesthetics with modern, fast-paced combat mechanics.
 
-![License](https://img.shields.io/badge/license-GPLv2-blue.svg)
-![Language](https://img.shields.io/badge/language-C%2B%2B-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Language](https://img.shields.io/badge/language-C%2B%2B17-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)
 
-## 🎮 Features
-- **Online Multiplayer**: Host and Join games over TCP/IP.
-- **Real-Time Sync**: Full state synchronization (movement, attacks, projectiles, power-ups).
-- **Lobby System**: Character selection, name input, and ready system.
-- **Combat**: Melee attacks, fireballs, and special power-ups (Dragon, Rhino).
-- **Robust Networking**: Non-blocking sockets with disconnect handling and forfeit systems.
+---
 
-## 🛠️ Installation & Build Guide
+## ✨ Features
 
-### Prerequisites
-You need a C++ compiler (`clang` or `g++`) and the **SDL2** development libraries.
+### 🎮 Gameplay
+*   **Intense PvP Combat**: Battle your friends in 1v1 duels.
+*   **Local & Online**: Play on the same keyboard or connect over the internet.
+*   **Unique Characters**:
+    *   **Raju**: A balanced fighter who commands fire.
+    *   **Priya**: A swift agile warrior with lightning-fast dashes.
+*   **Dynamic Physics**: Master double jumps, wall jumps, and momentum-based movement.
+*   **Power-Ups**: Turn the tide with random spawns like **Health Packs**, **Speed Boosts**, and **Shields**.
 
-#### macOS (Homebrew)
-```bash
-brew install sdl2 sdl2_image sdl2_ttf sdl2_net
-```
+### 🛠️ Technical
+*   **Custom Engine**: Built on top of SDL2 for maximum performance and control.
+*   **Authoritative Networking**: Host-Client architecture ensures fair play and synchronization.
+*   **Cross-Platform**: Runs natively on **macOS** and **Linux** (Debian/Ubuntu/Arch).
 
-#### Linux (Debian/Ubuntu)
-```bash
-sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
-```
+---
 
-### Building the Game (CMake)
-We use **CMake** for cross-platform builds.
+## 🚀 Installation Guide
 
-**Prerequisites:**
--   CMake (3.14+)
--   SDL2, SDL2_image, SDL2_ttf, SDL2_net (Development libraries)
-
-**Build Steps:**
-```bash
-mkdir build && cd build
-cmake ..
-cmake --build .
-```
-
-### Creating Installers 📦
-You can generate an installer for your OS (macOS .dmg, Windows .exe, Linux .deb) by running:
-```bash
-cd build
-cpack
-```
-
-### Building the Signaling Server
-The server is currently built separately:
-```bash
-cd server
-./build.sh
-```
-
-### Running the Game
-1.  **Start the Server** (in one terminal):
+### 🍎 macOS
+1.  **Install Dependencies** (via [Homebrew](https://brew.sh/)):
     ```bash
-    cd server
-    ./server_app
+    brew install cmake sdl2 sdl2_image sdl2_ttf sdl2_net
     ```
-2.  **Start the Game** (in another terminal):
+2.  **Clone & Build**:
     ```bash
-    ./game
+    git clone https://github.com/PandiaJason/amphitude.git
+    cd amphitude
+    mkdir build && cd build
+    cmake ..
+    make
+    ```
+3.  **Run**:
+    ```bash
+    ./amphitude
     ```
 
-## 🕹️ How to Play
+### 🐧 Linux (Debian/Ubuntu/Mint)
+1.  **Install Dependencies**:
+    ```bash
+    sudo apt update
+    sudo apt install build-essential cmake git libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
+    ```
+2.  **Clone & Build**:
+    ```bash
+    git clone https://github.com/PandiaJason/amphitude.git
+    cd amphitude
+    mkdir build && cd build
+    cmake ..
+    make
+    ```
+3.  **Run**:
+    ```bash
+    ./amphitude
+    ```
 
-2.  Host runs `server_app`.
-3.  Game connects using the VPN IP.
-3.  **Lobby**:
-    - Press **T** to type your name.
-    - Press **1** (P1) or **2** (P2) to switch characters.
-    - Press **Enter** to toggle **Ready**.
-    - Press **Escape** to disconnect and return to the main menu.
-    - The game starts when both players are Ready.
-4.  **Game Over**:
-    - Press **Space** or **Escape** to return to the main menu.
+### 🐧 Linux (Arch/Manjaro)
+1.  **Install Dependencies**:
+    ```bash
+    sudo pacman -S base-devel cmake git sdl2 sdl2_image sdl2_ttf sdl2_net
+    ```
+2.  **Clone & Build**:
+    ```bash
+    git clone https://github.com/PandiaJason/amphitude.git
+    cd amphitude
+    mkdir build && cd build
+    cmake ..
+    make
+    ```
+3.  **Run**:
+    ```bash
+    ./amphitude
+    ```
 
-## 👨‍💻 Developer Documentation
+---
 
-### Project Structure
-```
-amphitude/
-├── src/                # Source files (.cpp)
-│   ├── Game.cpp        # Main game loop, state management, rendering
-│   ├── Player.cpp      # Player physics, collision, input
-│   ├── Utils.cpp       # Helper functions
-│   └── main.cpp        # Entry point
-├── include/            # Header files (.h)
-│   ├── Game.h          # Game class definition
-│   ├── NetworkManager.h# Networking logic (Sockets, Packets)
-│   ├── Player.h        # Player class definition
-│   └── Constants.h     # Global constants (Physics, Screen size)
-├── assets/             # Game assets (Images, Fonts)
-└── build.sh            # Compilation script
-```
+## 🕹️ Controls
 
-### Key Systems
+| Action | Player 1 (Host/Local) | Player 2 (Client/Local) |
+| :--- | :--- | :--- |
+| **Move** | `W`, `A`, `S`, `D` | `Arrow Keys` |
+| **Jump** | `W` (Double Jump) | `Up Arrow` (Double Jump) |
+| **Attack** | `Space` | `Enter` |
+| **Ability** | `E` | `/` |
+| **Pause** | `Esc` | `Esc` |
 
-#### Networking (`NetworkManager.h`)
-The game uses a **Host-Client** architecture.
-- **Host**: Authoritative. Calculates physics, spawns power-ups, manages game state. Sends full state snapshots to Client.
-- **Client**: Sends input to Host. Receives state snapshots and renders them.
-- **Packets**: Defined in `NetworkManager.h`. Types include `Input` (1), `State` (2), and `Start` (3).
-- **Sync**: The `Game::update` loop drains the socket buffer every frame to ensure the latest state is applied, minimizing latency.
+**Menu Shortcuts:**
+*   **H**: Host Online Game
+*   **J**: Join Online Game
+*   **L**: Start Local Game
+*   **Esc**: Quit / Back
 
-#### Game Loop (`Game.cpp`)
-Standard game loop:
-1.  **Handle Events**: Input processing, network connection handling.
-2.  **Update**: Physics integration, collision detection, network sync.
-3.  **Render**: Drawing sprites and UI to the screen.
+---
 
-### Contributing
-We welcome contributions! Please follow these steps:
-1.  Fork the repository.
-2.  Create a feature branch (`git checkout -b feature/AmazingFeature`).
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4.  Push to the branch (`git push origin feature/AmazingFeature`).
-5.  Open a Pull Request.
+## 🌐 Online Play (Manual Port Forwarding)
 
-## 📄 License
-This project is licensed under the **GNU General Public License v2.0** - see the [LICENSE](LICENSE) file for details.
+Amphitude uses a direct peer-to-peer connection. To host a game online:
+
+1.  **Port Forwarding**: Log into your router and forward **Port 12345 (TCP)** to your computer's local IP address.
+2.  **Host**: Launch the game and press **H**.
+3.  **Share IP**: Google "what is my ip" and send that Public IP to your friend.
+4.  **Join**: Your friend launches the game, presses **J**, enters your Public IP, and presses **Enter**.
+
+*Note: If you cannot port forward, you can use a VPN service like Hamachi or ZeroTier to create a virtual LAN.*
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community!
+
+1.  **Fork** the repository.
+2.  Create a **Feature Branch** (`git checkout -b feature/NewAbility`).
+3.  **Commit** your changes.
+4.  **Push** to the branch.
+5.  Open a **Pull Request**.
+
+---
+
+## 📜 License
+
+This project is open-source and available under the **MIT License**. Feel free to use, modify, and distribute it.
