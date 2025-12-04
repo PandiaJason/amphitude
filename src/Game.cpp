@@ -257,6 +257,9 @@ void Game::handleEvents(SDL_Event& event) {
                         p2NameInput = "Player 2";
                         typingName = false;
                     }
+                    if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        currentState = EXIT_CONFIRM;
+                    }
                 } else {
                     // Online Menu
                     if (net.isHost) {
@@ -427,6 +430,14 @@ void Game::handleEvents(SDL_Event& event) {
                 if (event.key.keysym.sym == SDLK_UP) players[1].keyJump = true;
                 if (event.key.keysym.sym == SDLK_DOWN) players[1].keyDown = true;
                 if (event.key.keysym.sym == SDLK_RETURN) players[1].keyAttack = true;
+            }
+            else if (currentState == EXIT_CONFIRM) {
+                if (event.key.keysym.sym == SDLK_y) {
+                    running = false;
+                }
+                if (event.key.keysym.sym == SDLK_n || event.key.keysym.sym == SDLK_ESCAPE) {
+                    currentState = MENU;
+                }
             }
             else if (currentState == GAMEOVER) {
                 if (event.key.keysym.sym == SDLK_SPACE || event.key.keysym.sym == SDLK_ESCAPE) {
@@ -1148,6 +1159,12 @@ void Game::render() {
                     }
                 }
             }
+        }
+    }
+    else if (currentState == EXIT_CONFIRM) {
+        if (font) {
+            renderCenteredText(250, "Quitting...", {255, 255, 255, 255}, font);
+            renderCenteredText(350, "Are you sure? (Y/N)", {255, 0, 0, 255}, font);
         }
     }
     else if (currentState == CHARACTER_SELECT) {
