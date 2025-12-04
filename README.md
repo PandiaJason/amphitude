@@ -33,17 +33,20 @@
     ```bash
     brew install cmake sdl2 sdl2_image sdl2_ttf sdl2_net
     ```
-2.  **Clone & Build**:
-    ```bash
-    git clone https://github.com/PandiaJason/amphitude.git
-    cd amphitude
-    mkdir build && cd build
-    cmake ..
-    make
     ```
-3.  **Run**:
-    ```bash
-    ./amphitude
+3.  **Build**:
+    *   **Option A (Simple)**:
+        ```bash
+        cd amphitude
+        make
+        ```
+    *   **Option B (CMake)**:
+        ```bash
+        cd amphitude
+        mkdir build && cd build
+        cmake ..
+        make
+        ```
     ```
 
 ### 🐧 Linux (Debian/Ubuntu/Mint)

@@ -10,7 +10,7 @@ install_manifest.txt
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
+
 .DS_Store
 Thumbs.db
 .vscode/
