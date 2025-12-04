@@ -606,6 +606,19 @@ void Game::update() {
                     }
                 }
                 
+                if (!net.connected) {
+                     currentState = MENU;
+                     net.disconnect();
+                     p1Ready = false;
+                     p2Ready = false;
+                     waitingForCode = false;
+                     enteringCode = false;
+                     secretCode = "";
+                     signalingError = "";
+                     connectionFailed = false;
+                     return;
+                }
+                
                 // Update Game Logic (Host Authority)
                 // ... (Existing update logic below) ...
                 Packet stateP;
@@ -757,7 +770,20 @@ void Game::update() {
                     }
                 }
             }
-        }
+            }
+            
+            if (!net.connected) {
+                 currentState = MENU;
+                 net.disconnect();
+                 p1Ready = false;
+                 p2Ready = false;
+                 waitingForCode = false;
+                 enteringCode = false;
+                 secretCode = "";
+                 signalingError = "";
+                 connectionFailed = false;
+                 return;
+            }
     }
     else if (currentState == GAMEOVER) {
         if (isOnline) {
