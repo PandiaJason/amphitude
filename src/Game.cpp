@@ -866,6 +866,7 @@ void Game::update() {
                     }
                 }
                 if (!net.connected) {
+                    isOnline = false;
                     currentState = MENU;
                      net.disconnect();
                      p1Ready = false;
