@@ -28,17 +28,12 @@
 
 ## 🛠️ Installation & Build Guide
 
-### ⚡ Quick Start (All Platforms)
+## 🛠️ Installation & Build Guide
+
+### ⚡ Quick Start
 1.  **Install Dependencies** (see below).
-2.  **Build**:
-    ```bash
-    ./build.sh
-    ```
-3.  **Run**:
-    ```bash
-    ./server_app  # Terminal 1
-    ./amphitude   # Terminal 2
-    ```
+2.  **Run Build Script**: `./build.sh`
+3.  **Play**: `./amphitude`
 
 ### 📦 Dependency Installation
 
@@ -53,8 +48,29 @@ sudo apt update
 sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
 ```
 
+#### 🏹 Linux (Arch/Manjaro)
+```bash
+sudo pacman -S base-devel sdl2 sdl2_image sdl2_ttf sdl2_net
+```
+
 #### 🪟 Windows (MinGW)
 Install **SDL2** libraries via **pacman** in MSYS2 or MinGW.
+
+---
+
+## 🛠️ How to Build & Run
+
+Once dependencies are installed, building is easy!
+
+1.  **Build the Game**:
+    ```bash
+    ./build.sh
+    ```
+    *(This script automatically detects your OS and compiles everything)*
+
+2.  **Run the Game**:
+    *   **Game Client**: `./amphitude`
+    *   **Server**: `./server_app` (Only needed for hosting online)
 
 ---
 
