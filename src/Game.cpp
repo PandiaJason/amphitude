@@ -1159,6 +1159,7 @@ void Game::render() {
                 if (!signalingError.empty()) {
                     renderCenteredText(450, signalingError, {255, 0, 0, 255}, font);
                 }
+                renderCenteredText(550, "amphitainments", {100, 100, 100, 255}, font);
             } else {
                 if (net.isHost) {
                     if (waitingForCode) {
