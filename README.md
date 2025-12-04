@@ -72,39 +72,25 @@ Install **SDL2** libraries via **pacman** in MSYS2 or MinGW.
 *   **H**: Host Online Game
 *   **J**: Join Online Game
 *   **L**: Start Local Game
+*   **S**: Set Server IP (For VPN/LAN)
 *   **Esc**: Quit / Back
 
 ---
 
-## 🌐 Online Play
+## 🌐 Online Play Guide
 
-Amphitude uses a **Signaling Server** to exchange connection details via simple codes.
+Amphitude uses a **Signaling Server** to connect players. You can play on a **Local Network (LAN)** or over the **Internet** using a free VPN like ZeroTier.
 
-1.  **Start the Server**:
-    *   Open a terminal in the `build` folder.
-    *   Run `./server_app`.
-    *   Keep this terminal open!
+### 🏠 Option 1: Local Network (LAN) / Same WiFi
+If you and your friend are on the same WiFi:
+1.  **Run Server**: `./server_app` on one computer.
+2.  **Host**: Run `./amphitude`, press **S**, enter the **Local IP** of the server computer (e.g., `192.168.1.5`), then press **H**.
+3.  **Join**: Run `./amphitude`, press **S**, enter the same **Local IP**, then press **J** and enter the code.
 
-2.  **Host a Game**:
-    *   Run `./amphitude`.
-    *   Press **H**.
-    *   The game will generate a **Code** (e.g., `X7Z29A`).
-    *   Share this code with your friend.
+### 🌍 Option 2: Internet Play (ZeroTier VPN)
+We recommend **ZeroTier** for free, easy online play anywhere in the world.
 
-3.  **Join a Game**:
-    *   Run `./amphitude`.
-    *   Press **J**.
-    *   Enter the **Code** and press **Enter**.
-
-*Note: For play over the internet, both players must be able to reach the Signaling Server. Currently, it defaults to `localhost` for testing.*
-
----
-
-## 🌍 How to Play Online (Free VPN Method)
-
-We recommend **ZeroTier** for free, easy online play without port forwarding.
-
-### 1. Setup ZeroTier 🛡️
+#### 1. Setup ZeroTier 🛡️
 1.  **Create a Network**: Go to [ZeroTier Central](https://my.zerotier.com/), create an account, and create a "Network". Copy the **Network ID**.
 2.  **Install App**: Download and install the **ZeroTier One** app on both computers.
 3.  **Join Network**:
@@ -122,7 +108,7 @@ We recommend **ZeroTier** for free, easy online play without port forwarding.
     *   **Check the box** under "Auth?" for your device ID.
     *   Wait a moment until you see a **Managed IP** (e.g., `10.147.x.x`).
 
-### 2. Play the Game 🎮
+#### 2. Play the Game 🎮
 1.  **Host**:
     *   Run `./server_app` and `./amphitude`.
     *   In the Game Menu, press **S** and type your **ZeroTier Managed IP**.
