@@ -50,6 +50,10 @@ target_link_libraries(amphitude PRIVATE
 
 )
 
+# --- Server Executable ---
+add_executable(server_app server/main.cpp)
+target_link_libraries(server_app PRIVATE SDL2::SDL2 SDL2_net::SDL2_net)
+
 # Copy Assets to Build Directory (for running locally)
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 
