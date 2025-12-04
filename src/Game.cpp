@@ -1267,19 +1267,17 @@ void Game::render() {
                     SDL_RenderCopy(renderer, mudTileTexture, NULL, &destRect);
                 }
             } else {
-                // Other platforms (Pixelated White Transparent)
+                // Other platforms (Glass-like Transparent)
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 180); // White, slightly more opaque for pixels
+                SDL_SetRenderDrawColor(renderer, 200, 200, 255, 100); // Light Blue-ish White, Semi-transparent
 
-                int pixelSize = 3;
-                for (int y = p.y; y < p.y + p.height; y += pixelSize) {
-                    for (int x = p.x; x < p.x + p.width; x += pixelSize) {
-                        // Checkerboard pattern
-                        if (((x / pixelSize) + (y / pixelSize)) % 2 == 0) {
-                            drawRect(renderer, x, y, pixelSize, pixelSize, {255, 255, 255, 180});
-                        }
-                    }
-                }
+                SDL_Rect platformRect = { static_cast<int>(p.x), static_cast<int>(p.y), static_cast<int>(p.width), static_cast<int>(p.height) };
+                SDL_RenderFillRect(renderer, &platformRect);
+                
+                // Optional: Add a subtle border for better visibility
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 150);
+                SDL_RenderDrawRect(renderer, &platformRect);
+
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
             }
         }
