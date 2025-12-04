@@ -69,32 +69,6 @@ cd server
 
 ## 🕹️ How to Play
 
-### Controls
-| Action | Player 1 (Host/Local) | Player 2 (Client/Local) |
-| :--- | :--- | :--- |
-| **Move** | W, A, S, D | Arrow Keys |
-| **Jump** | W | Up Arrow |
-| **Attack** | F | Enter |
-| **Pause** | Escape | Escape |
-| **Forfeit** | Y (in Pause Menu) | Y (in Pause Menu) |
-
-### Online Multiplayer
-1.  **Host**: Select **Host (H)**. The game will generate a **Secret Code** (e.g., `X7Z29A`). Share this with your friend.
-    - Press **Escape** to cancel.
-2.  **Join**: Select **Join (J)**. Enter the **Secret Code** and press **Enter**.
-    - Press **Escape** to cancel.
-
-#### Playing Over the Internet 🌍
-To play with someone on a different network, you need **Port Forwarding** or a **VPN**.
-
-**Option A: Manual Port Forwarding (Recommended)**
-1.  **Host**: Forward port **12345** (TCP) to your local IP in your router settings.
-2.  **Server**: Run the `server_app`.
-3.  **Host**: Press **H** in-game.
-4.  **Client**: Enter the **Secret Code**.
-
-**Option B: VPN (Hamachi/ZeroTier)**
-1.  Both players join the VPN.
 2.  Host runs `server_app`.
 3.  Game connects using the VPN IP.
 3.  **Lobby**:

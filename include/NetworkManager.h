@@ -158,12 +158,14 @@ public:
                     if (received > 0) {
                         return true;
                     } else if (received == 0) {
-                        // Connection closed
+                        // Connection closed by peer
+                        std::cout << "Connection closed by peer." << std::endl;
                         connected = false;
-                        SDLNet_TCP_DelSocket(socketSet, client);
-                        SDLNet_TCP_Close(client);
-                        client = nullptr;
-                        std::cout << "Disconnected." << std::endl;
+                    } else {
+                        // Error (-1)
+                        // Previously we ignored this, so we'll log it but stay connected to avoid dropping active games on temp errors.
+                        std::cerr << "SDLNet_TCP_Recv Error: " << SDLNet_GetError() << std::endl;
+                        // connected = false; // Don't disconnect on error for now, just log
                     }
                 }
             }

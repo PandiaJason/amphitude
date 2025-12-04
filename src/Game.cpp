@@ -202,7 +202,7 @@ void Game::spawnPowerUps() {
 
 void Game::handleEvents(SDL_Event& event) {
     // Poll events using for(;;) loop
-    for (; SDL_PollEvent(&event); ) {
+    while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) running = false;
         else if (event.type == SDL_TEXTINPUT) {
             if (ignoreInputFrames > 0) {
@@ -249,7 +249,13 @@ void Game::handleEvents(SDL_Event& event) {
                     }
                     if (event.key.keysym.sym == SDLK_l) {
                         // Local Game
+                        isOnline = false;
                         currentState = CHARACTER_SELECT;
+                        p1Ready = false;
+                        p2Ready = false;
+                        p1NameInput = "Player 1";
+                        p2NameInput = "Player 2";
+                        typingName = false;
                     }
                 } else {
                     // Online Menu
@@ -324,14 +330,19 @@ void Game::handleEvents(SDL_Event& event) {
 
                     // Toggle Ready
                     if (event.key.keysym.sym == SDLK_RETURN) {
-                        if (!isOnline || net.isHost) p1Ready = !p1Ready;
-                        if (!isOnline || !net.isHost) p2Ready = !p2Ready; // Local: both toggle? Or separate keys?
-                        // For Local, let's say Enter toggles P1, and maybe Shift toggles P2? 
-                        // Or just assume P2 is ready if P1 is ready for local simplicity.
-                        // Actually, user said "both agree". Let's stick to Enter for "My Ready Status".
-                        // For local, P2 might need a key. Let's use 'R' for P2 ready in local.
                         if (!isOnline) {
-                             // Reset P2 ready if we just toggled P1, to be safe? No.
+                            // Local: Force both to Ready if not already
+                            if (!p1Ready || !p2Ready) {
+                                p1Ready = true;
+                                p2Ready = true;
+                            } else {
+                                p1Ready = false;
+                                p2Ready = false;
+                            }
+                        } else {
+                            // Online: Toggle my own ready status
+                            if (net.isHost) p1Ready = !p1Ready;
+                            else p2Ready = !p2Ready;
                         }
                     }
                     if (!isOnline && event.key.keysym.sym == SDLK_r) {
@@ -352,7 +363,7 @@ void Game::handleEvents(SDL_Event& event) {
                             net.disconnect();
                             isOnline = false;
                         }
-                        currentState = MENU;
+                    currentState = MENU;
                         // Reset Lobby State
                         p1Ready = false;
                         p2Ready = false;
@@ -452,7 +463,7 @@ void Game::handleEvents(SDL_Event& event) {
                         else players[1].hp = 0;
                         
                     } else {
-                        currentState = MENU;
+                    currentState = MENU;
                     }
                 }
                 if (event.key.keysym.sym == SDLK_n || event.key.keysym.sym == SDLK_ESCAPE) currentState = PLAYING;
@@ -473,10 +484,12 @@ void Game::handleEvents(SDL_Event& event) {
             if (event.key.keysym.sym == SDLK_RETURN) players[1].keyAttack = false;
         }
     }
-    }
+}
 
 
 void Game::update() {
+
+    // Timer Logic
     if (ignoreInputFrames > 0) ignoreInputFrames--;
 
     // Auto-transition Host to Lobby
@@ -553,6 +566,15 @@ void Game::update() {
                 Packet hostP;
                 for (; net.receive(hostP); ) {
                     if (hostP.type == 2) {
+                        // Check if Host has already started the game
+                        if (hostP.gameState == PLAYING) {
+                             players[0].name = p1NameInput; // Use last known name
+                             players[1].name = p2NameInput;
+                             resetGame();
+                             currentState = PLAYING;
+                             return;
+                        }
+
                         p1Character = hostP.p1Char;
                         p1NameInput = hostP.p1Name;
                         p1Ready = hostP.p1Ready;
@@ -562,12 +584,14 @@ void Game::update() {
                          players[1].name = p2NameInput;
                          resetGame();
                          currentState = PLAYING;
+                         return;
                     }
                 }
             }
         } else {
             // Local Play Start Logic
             if (p1Ready && p2Ready) { // Require both ready for local too
+                 isOnline = false; // Ensure we are offline
                  players[0].name = p1NameInput;
                  players[1].name = p2NameInput;
                  resetGame();
@@ -607,6 +631,7 @@ void Game::update() {
                 }
                 
                 if (!net.connected) {
+                     isOnline = false;
                      currentState = MENU;
                      net.disconnect();
                      p1Ready = false;
@@ -772,7 +797,8 @@ void Game::update() {
             }
             }
             
-            if (!net.connected) {
+            if (isOnline && !net.connected) {
+                 isOnline = false;
                  currentState = MENU;
                  net.disconnect();
                  p1Ready = false;
@@ -827,7 +853,7 @@ void Game::update() {
                     }
                 }
                 if (!net.connected) {
-                     currentState = MENU;
+                    currentState = MENU;
                      net.disconnect();
                      p1Ready = false;
                      p2Ready = false;
