@@ -383,10 +383,10 @@ void Game::handleEvents(SDL_Event& event) {
                              resetGame();
                              currentState = PLAYING;
                         } else {
-                            currentState = NAME_INPUT;
-                            inputtingP1 = true;
-                            inputText = "";
-                            SDL_StartTextInput();
+                            // Local Game: Skip Name Input too (User Request)
+                            // Use default names set in 'L' key handler or current input
+                            resetGame();
+                            currentState = PLAYING;
                         }
                     }
                 }
