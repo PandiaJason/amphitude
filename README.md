@@ -135,4 +135,8 @@ We welcome contributions from the community!
 
 ## 📜 License
 
-This project is open-source and available under the **MIT License**. Feel free to use, modify, and distribute it.
+This project is open-source and available under the **GNU General Public License v2.0 (GPLv2)**.
+
+**Copyright (c) 2025 Amphitainments**
+
+Feel free to use, modify, and distribute it under the terms of the license.
