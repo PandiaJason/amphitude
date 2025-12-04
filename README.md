@@ -83,6 +83,28 @@
     ./amphitude
     ```
 
+    ```
+
+### 🪟 Windows
+1.  **Install Prerequisites**:
+    *   **Visual Studio** (with "Desktop development with C++").
+    *   **CMake** (from cmake.org).
+    *   **SDL2 Libraries**: The easiest way is using **vcpkg**:
+        ```powershell
+        vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-net
+        vcpkg integrate install
+        ```
+2.  **Build**:
+    ```powershell
+    mkdir build; cd build
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=[path_to_vcpkg]/scripts/buildsystems/vcpkg.cmake
+    cmake --build .
+    ```
+3.  **Run**:
+    ```powershell
+    .\Debug\amphitude.exe
+    ```
+
 ---
 
 ## 🕹️ Controls
