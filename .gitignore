@@ -1,4 +1,7 @@
 # Build artifacts
+amphitude
+server_app
+*.exe
 game
 server/server_app
 *.o
@@ -15,3 +18,5 @@ cmake_install.cmake
 Thumbs.db
 .vscode/
 .idea/
+amphitude
+server_app
