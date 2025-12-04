@@ -28,54 +28,33 @@
 
 ## 🛠️ Installation & Build Guide
 
-### 🍎 macOS
-1.  **Install Dependencies**:
+### ⚡ Quick Start (All Platforms)
+1.  **Install Dependencies** (see below).
+2.  **Build**:
     ```bash
-    brew install sdl2 sdl2_image sdl2_ttf sdl2_net
-    ```
-2.  **Compile**:
-    ```bash
-    # Game
-    g++ -std=c++17 src/*.cpp -Iinclude -o amphitude -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net
-
-    # Server
-    g++ -std=c++17 server/main.cpp -o server_app -lSDL2 -lSDL2_net
+    ./build.sh
     ```
 3.  **Run**:
     ```bash
-    ./server_app  # In terminal 1
-    ./amphitude   # In terminal 2
+    ./server_app  # Terminal 1
+    ./amphitude   # Terminal 2
     ```
 
-### 🐧 Linux (Debian/Ubuntu/Mint)
-1.  **Install Dependencies**:
-    ```bash
-    sudo apt update
-    sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
-    ```
-2.  **Compile**:
-    ```bash
-    # Game
-    g++ -std=c++17 src/*.cpp -Iinclude -o amphitude -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net
+### 📦 Dependency Installation
 
-    # Server
-    g++ -std=c++17 server/main.cpp -o server_app -lSDL2 -lSDL2_net
-    ```
-3.  **Run**:
-    ```bash
-    ./server_app  # In terminal 1
-    ./amphitude   # In terminal 2
-    ```
+#### 🍎 macOS
+```bash
+brew install sdl2 sdl2_image sdl2_ttf sdl2_net
+```
 
-### 🪟 Windows (MinGW / Git Bash)
-1.  **Install Dependencies**:
-    *   Install **MSYS2** or **MinGW**.
-    *   Install SDL2 development libraries.
-2.  **Compile**:
-    ```bash
-    g++ -std=c++17 src/*.cpp -Iinclude -o amphitude.exe -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net
-    g++ -std=c++17 server/main.cpp -o server_app.exe -lmingw32 -lSDL2main -lSDL2 -lSDL2_net
-    ```
+#### 🐧 Linux (Debian/Ubuntu)
+```bash
+sudo apt update
+sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
+```
+
+#### 🪟 Windows (MinGW)
+Install **SDL2** libraries via **pacman** in MSYS2 or MinGW.
 
 ---
 
