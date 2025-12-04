@@ -834,6 +834,19 @@ void Game::update() {
                 stateP.p2HP = players[1].hp;
                 
                 net.send(stateP);
+                
+                if (!net.connected) {
+                     isOnline = false;
+                     currentState = MENU;
+                     net.disconnect();
+                     p1Ready = false;
+                     p2Ready = false;
+                     waitingForCode = false;
+                     enteringCode = false;
+                     secretCode = "";
+                     signalingError = "";
+                     connectionFailed = false;
+                }
             } else {
                 // Client listens for state change (Back to Lobby)
                 Packet p;
