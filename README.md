@@ -26,86 +26,55 @@
 
 ---
 
-## 🚀 Installation Guide
+## 🛠️ Installation & Build Guide
 
 ### 🍎 macOS
-1.  **Install Dependencies** (via [Homebrew](https://brew.sh/)):
+1.  **Install Dependencies**:
     ```bash
-    brew install cmake sdl2 sdl2_image sdl2_ttf sdl2_net
+    brew install sdl2 sdl2_image sdl2_ttf sdl2_net
     ```
+2.  **Compile**:
+    ```bash
+    # Game
+    g++ -std=c++17 src/*.cpp -Iinclude -o amphitude -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net
+
+    # Server
+    g++ -std=c++17 server/main.cpp -o server_app -lSDL2 -lSDL2_net
     ```
-3.  **Build**:
-    *   **Option A (Simple)**:
-        ```bash
-        cd amphitude
-        make
-        ```
-    *   **Option B (CMake)**:
-        ```bash
-        cd amphitude
-        mkdir build && cd build
-        cmake ..
-        make
-        ```
+3.  **Run**:
+    ```bash
+    ./server_app  # In terminal 1
+    ./amphitude   # In terminal 2
     ```
 
 ### 🐧 Linux (Debian/Ubuntu/Mint)
 1.  **Install Dependencies**:
     ```bash
     sudo apt update
-    sudo apt install build-essential cmake git libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
+    sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
     ```
-2.  **Clone & Build**:
+2.  **Compile**:
     ```bash
-    git clone https://github.com/PandiaJason/amphitude.git
-    cd amphitude
-    mkdir build && cd build
-    cmake ..
-    make
+    # Game
+    g++ -std=c++17 src/*.cpp -Iinclude -o amphitude -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net
+
+    # Server
+    g++ -std=c++17 server/main.cpp -o server_app -lSDL2 -lSDL2_net
     ```
 3.  **Run**:
     ```bash
-    ./amphitude
+    ./server_app  # In terminal 1
+    ./amphitude   # In terminal 2
     ```
 
-### 🐧 Linux (Arch/Manjaro)
+### 🪟 Windows (MinGW / Git Bash)
 1.  **Install Dependencies**:
+    *   Install **MSYS2** or **MinGW**.
+    *   Install SDL2 development libraries.
+2.  **Compile**:
     ```bash
-    sudo pacman -S base-devel cmake git sdl2 sdl2_image sdl2_ttf sdl2_net
-    ```
-2.  **Clone & Build**:
-    ```bash
-    git clone https://github.com/PandiaJason/amphitude.git
-    cd amphitude
-    mkdir build && cd build
-    cmake ..
-    make
-    ```
-3.  **Run**:
-    ```bash
-    ./amphitude
-    ```
-
-    ```
-
-### 🪟 Windows
-1.  **Install Prerequisites**:
-    *   **Visual Studio** (with "Desktop development with C++").
-    *   **CMake** (from cmake.org).
-    *   **SDL2 Libraries**: The easiest way is using **vcpkg**:
-        ```powershell
-        vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-net
-        vcpkg integrate install
-        ```
-2.  **Build**:
-    ```powershell
-    mkdir build; cd build
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=[path_to_vcpkg]/scripts/buildsystems/vcpkg.cmake
-    cmake --build .
-    ```
-3.  **Run**:
-    ```powershell
-    .\Debug\amphitude.exe
+    g++ -std=c++17 src/*.cpp -Iinclude -o amphitude.exe -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net
+    g++ -std=c++17 server/main.cpp -o server_app.exe -lmingw32 -lSDL2main -lSDL2 -lSDL2_net
     ```
 
 ---
