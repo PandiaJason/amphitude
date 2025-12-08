@@ -1,10 +1,11 @@
 # amphitude
 
-**amphitude** is a high-octane, 2D multiplayer platform fighter built from scratch with C++ and SDL2. It blends retro pixel-art aesthetics with modern, fast-paced combat mechanics.
+**amphitude** is a high-octane, **serverless P2P** 2D multiplayer platform fighter built from scratch with C++ and SDL2. It blends retro pixel-art aesthetics with modern, fast-paced combat mechanics.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Language](https://img.shields.io/badge/language-C%2B%2B17-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)
+![Network](https://img.shields.io/badge/network-Serverless%20P2P-green.svg)
 
 ---
 
@@ -12,21 +13,20 @@
 
 ### 🎮 Gameplay
 *   **Intense PvP Combat**: Battle your friends in 1v1 duels.
-*   **Local & Online**: Play on the same keyboard or connect over the internet.
+*   **True P2P Multiplayer**: No servers, no accounts, no lag. Connect directly via UDP Hole Punching.
 *   **Unique Characters**:
     *   **Xeno**: A Playable Character -> Male.
     *   **Zeni**: A Playable Character -> Female.
 *   **Dynamic Physics**: Master double jumps, wall jumps, and momentum-based movement.
-*   **Power-Ups**: Turn the tide with random spawns like **Health Packs**, **Dragon Suit which can fire**, and **Rhino Suit which can 2x damage**.
+*   **Power-Ups**: Turn the tide with random spawns like **Health Packs**, **Dragon Suit** (fireball), and **Rhino Suit** (2x damage).
+*   **Lobby System**: Countdown timer (3... 2... 1... GO!) ensures fair starts.
 
 ### 🛠️ Technical
-*   **Custom Engine**: Built on top of SDL2 for maximum performance and control.
-*   **Authoritative Networking**: Host-Client architecture ensures fair play and synchronization.
-*   **Cross-Platform**: Runs natively on **macOS** and **Linux** (Debian/Ubuntu/Arch).
+*   **Custom Engine**: Built on top of SDL2 for maximum performance.
+*   **UDP Networking**: Custom reliable UDP protocol with NAT Hole Punching (STUN).
+*   **Serverless**: Zero backend infrastructure required.
 
 ---
-
-## 🛠️ Installation & Build Guide
 
 ## 🛠️ Installation & Build Guide
 
@@ -48,29 +48,28 @@ sudo apt update
 sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
 ```
 
-#### 🏹 Linux (Arch/Manjaro)
-```bash
-sudo pacman -S base-devel sdl2 sdl2_image sdl2_ttf sdl2_net
-```
-
-#### 🪟 Windows (MinGW)
-Install **SDL2** libraries via **pacman** in MSYS2 or MinGW.
-
 ---
 
-## 🛠️ How to Build & Run
+## 🌐 How to Play Online (Covai <-> Chennai Protocol)
 
-Once dependencies are installed, building is easy!
+Amphitude uses **Serverless P2P** technology to connect players directly over the internet without a central server.
 
-1.  **Build the Game**:
-    ```bash
-    ./build.sh
-    ```
-    *(This script automatically detects your OS and compiles everything)*
+### 1. Host (Player A)
+1.  Run `./amphitude` and press **H** (Host).
+2.  You will see **Your Join Code** (e.g., `123.45.67.89:50000`).
+3.  **Send this code** to your friend via WhatsApp/Telegram.
+4.  **Wait** for your friend's code.
 
-2.  **Run the Game**:
-    *   **Game Client**: `./amphitude`
-    *   **Server**: `./server_app` (Only needed for hosting online)
+### 2. Client (Player B)
+1.  Run `./amphitude` and press **J** (Join).
+2.  You will see **Your Join Code**.
+3.  **Send this code** to your friend.
+4.  Enter the **Host's Code** and wait.
+
+### 3. Connect
+1.  Both players enter the **Friend's Code**.
+2.  Both players press **ENTER**.
+3.  The game will punch through firewalls and connect! 🥊
 
 ---
 
@@ -85,66 +84,10 @@ Once dependencies are installed, building is easy!
 
 **Menu Shortcuts:**
 *   **H**: Host Online Game
-*   **J**: Join Online Game
-*   **L**: Start Local Game
-*   **S**: Set Server IP (For VPN/LAN)
+*   **J**: Join Online Game (Client)
+*   **L**: Local 1v1 Game
+*   **Enter / Space**: Toggle Ready (Lobby)
 *   **Esc**: Quit / Back
-
----
-
-## 🌐 Online Play Guide
-
-Amphitude uses a **Signaling Server** to connect players. You can play on a **Local Network (LAN)** or over the **Internet** using a free VPN like ZeroTier.
-
-### 🏠 Option 1: Local Network (LAN) / Same WiFi
-If you and your friend are on the same WiFi:
-1.  **Run Server**: `./server_app` on one computer.
-2.  **Host**: Run `./amphitude`, press **S**, enter the **Local IP** of the server computer (e.g., `192.168.1.5`), then press **H**.
-3.  **Join**: Run `./amphitude`, press **S**, enter the same **Local IP**, then press **J** and enter the code.
-
-### 🌍 Option 2: Internet Play (ZeroTier VPN)
-We recommend **ZeroTier** for free, easy online play anywhere in the world.
-
-#### 1. Setup ZeroTier 🛡️
-1.  **Create a Network**: Go to [ZeroTier Central](https://my.zerotier.com/), create an account, and create a "Network". Copy the **Network ID**.
-2.  **Install App**: Download and install the **ZeroTier One** app on both computers.
-3.  **Join Network**:
-    *   **Option A (App)**: Open the app, click "Join Network", and paste the **Network ID**.
-    *   **Option B (Terminal)**:
-        ```bash
-        sudo zerotier-cli join <NETWORK_ID>
-        ```
-4.  **Authorize Members** (Crucial Step!):
-    *   **Find Your Device ID**:
-        *   **App**: Click the ZeroTier icon in the menu bar.
-        *   **Terminal**: Run `sudo zerotier-cli info` (The 10-character code is your ID).
-    *   Go back to the ZeroTier website (Network settings).
-    *   Scroll down to the "Members" section.
-    *   **Check the box** under "Auth?" for your device ID.
-    *   Wait a moment until you see a **Managed IP** (e.g., `10.147.x.x`).
-
-#### 2. Play the Game 🎮
-1.  **Host**:
-    *   Run `./server_app` and `./amphitude`.
-    *   In the Game Menu, press **S** and type your **ZeroTier Managed IP**.
-    *   Press **H** to Host.
-    *   Share the **Secret Code** with your friend.
-2.  **Client**:
-    *   Run `./amphitude`.
-    *   Press **S** and type the **Host's ZeroTier Managed IP**.
-    *   Press **J** and enter the Secret Code.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from the community!
-
-1.  **Fork** the repository.
-2.  Create a **Feature Branch** (`git checkout -b feature/NewAbility`).
-3.  **Commit** your changes.
-4.  **Push** to the branch.
-5.  Open a **Pull Request**.
 
 ---
 
@@ -153,5 +96,3 @@ We welcome contributions from the community!
 This project is open-source and available under the **GNU General Public License v2.0 (GPLv2)**.
 
 **Copyright (c) 2025 amphitainments**
-
-Feel free to use, modify, and distribute it under the terms of the license.

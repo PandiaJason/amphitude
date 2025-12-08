@@ -10,7 +10,7 @@ Game::Game() : window(nullptr), renderer(nullptr), font(nullptr), titleFont(null
     boyRhinoTexture(nullptr), girlRhinoTexture(nullptr), backgroundTexture(nullptr),
              crystalTexture(nullptr),
              currentState(MENU), running(true), p1Character(0), p2Character(1), lastPowerUpTime(0),
-             gameTime(GameConstants::GAME_DURATION), inputtingP1(true) {}
+             gameTime(GameConstants::GAME_DURATION) {}
 
 Game::~Game() {
     cleanup();
@@ -59,12 +59,8 @@ void Game::run() {
     // Main Game Loop using for(;;) as requested for industry standard flow
     for (; running; ) {
         Uint32 frameStart = SDL_GetTicks();
-        // Network Handshake
-        if (isOnline && !net.connected) {
-            if (net.isHost) {
-                net.acceptClient();
-            }
-        }
+        // UDP Handshake is handled in update/receive
+        // if (isOnline && !net.connected) { ... }
 
         handleEvents(event); // 1. Input
         update();            // 2. Logic
@@ -220,9 +216,7 @@ void Game::handleEvents(SDL_Event& event) {
                     p2NameInput += event.text.text;
                 }
             }
-            else if (currentState == NAME_INPUT) {
-                inputText += event.text.text;
-            }
+
             else if (currentState == SERVER_IP_INPUT) {
                 inputText += event.text.text;
             }
@@ -233,43 +227,42 @@ void Game::handleEvents(SDL_Event& event) {
                 if (!isOnline) {
                     if (event.key.keysym.sym == SDLK_h) {
                         isOnline = true;
-                        // Request Code from Signaling Server
-                        secretCode = net.requestHostCode(12345);
-                        if (secretCode.empty()) {
-                            signalingError = "Failed to reach Signaling Server";
-                            isOnline = false;
-                        } else {
-                            net.hostGame(12345);
-                            waitingForCode = true; // Waiting for client to join via code
-                        }
+                        // UDP Host Logic: Set self as host, discover Public IP
+                        net.setAsHost();
+                        
+                        waitingForCode = true; // Waiting for Peer to PUNCH
+                        // Show Code and wait for Client to enter it.
+                        currentState = SERVER_IP_INPUT; // Reusing this state for "Enter Peer Code"
+                        inputText = "";
+                        SDL_StartTextInput();
+                        ignoreInputFrames = 2; // Prevent 'h' from being typed
                     }
                     if (event.key.keysym.sym == SDLK_j) {
                         isOnline = true;
-                        enteringCode = true;
-                        secretCode = "";
+                        // UDP Client Logic:
+                        // 1. Discover Public IP
+                        net.discoverPublicIP();
+                        
+                        currentState = SERVER_IP_INPUT; // Enter Host Code
+                        inputText = "";
                         SDL_StartTextInput();
-                        ignoreInputFrames = 2;
+                        ignoreInputFrames = 2; // Prevent 'j' from being typed
                     }
                     if (event.key.keysym.sym == SDLK_l) {
                         // Local Game
                         isOnline = false;
+                        resetGame();
                         currentState = CHARACTER_SELECT;
-                        p1Ready = false;
-                        p2Ready = false;
-                        p1NameInput = "Player 1";
-                        p2NameInput = "Player 2";
+                        // Skip lobby for local? Or go to lobby? Let's go to lobby for char select.
+                        p1Ready = false; p2Ready = false;
                         typingName = false;
                     }
+
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        currentState = EXIT_CONFIRM;
-                    }
-                    if (event.key.keysym.sym == SDLK_s) {
-                        currentState = SERVER_IP_INPUT;
-                        SDL_StartTextInput();
-                        inputText = ipInput; // Pre-fill with current
+                         currentState = EXIT_CONFIRM; // New state for confirmation
                     }
                 } else {
-                    // Online Menu
+                    // Online Menu (Original logic for signaling server, now potentially unused or repurposed)
                     if (net.isHost) {
                          // Host Waiting Logic (Handled in update)
                          if (event.key.keysym.sym == SDLK_ESCAPE) {
@@ -278,43 +271,8 @@ void Game::handleEvents(SDL_Event& event) {
                              waitingForCode = false;
                          }
                     } else {
-                        // Client Entering Code
-                        if (enteringCode) {
-                            if (event.key.keysym.sym == SDLK_RETURN) {
-                                SDL_StopTextInput();
-                                std::string addr = net.resolveJoinCode(secretCode);
-                                if (addr.empty()) {
-                                    signalingError = "Invalid or Expired Code";
-                                    // Stay in menu to retry
-                                } else {
-                                    // Parse IP and Port
-                                    size_t spacePos = addr.find(' ');
-                                    if (spacePos != std::string::npos) {
-                                        std::string ip = addr.substr(0, spacePos);
-                                        int port = std::stoi(addr.substr(spacePos + 1));
-                                        
-                                        if (net.joinGame(ip, port)) {
-                                            currentState = CHARACTER_SELECT;
-                                            connectionFailed = false;
-                                            enteringCode = false;
-                                        } else {
-                                            connectionFailed = true;
-                                            signalingError = "Connection Failed";
-                                            SDL_StartTextInput();
-                                        }
-                                    }
-                                }
-                            }
-                            if (event.key.keysym.sym == SDLK_BACKSPACE && secretCode.length() > 0) {
-                                secretCode.pop_back();
-                            }
-                            if (event.key.keysym.sym == SDLK_ESCAPE) {
-                                SDL_StopTextInput();
-                                isOnline = false;
-                                enteringCode = false;
-                                signalingError = "";
-                            }
-                        }
+                        // Client Entering Code logic is now in SERVER_IP_INPUT state handling above
+                        // We can remove this block or leave it empty/safe.
                     }
                 }
             }
@@ -340,7 +298,7 @@ void Game::handleEvents(SDL_Event& event) {
                     }
 
                     // Toggle Ready
-                    if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_SPACE) {
                         if (!isOnline) {
                             // Local: Force both to Ready if not already
                             if (!p1Ready || !p2Ready) {
@@ -383,41 +341,7 @@ void Game::handleEvents(SDL_Event& event) {
                     }
                 }
                 
-                // Start Game
-                if (event.key.keysym.sym == SDLK_SPACE) {
-                    if (!isOnline || net.isHost) {
-                        if (isOnline) {
-                             // Skip Name Input for Online to ensure sync
-                             Packet startP;
-                             startP.type = 3; // Start Game
-                             net.send(startP);
-                             resetGame();
-                             currentState = PLAYING;
-                        } else {
-                            // Local Game: Skip Name Input too (User Request)
-                            // Use default names set in 'L' key handler or current input
-                            resetGame();
-                            currentState = PLAYING;
-                        }
-                    }
                 }
-            }
-            else if (currentState == NAME_INPUT) {
-                if (event.key.keysym.sym == SDLK_SPACE) {
-                    if (inputtingP1) {
-                        p1NameInput = inputText;
-                        inputtingP1 = false;
-                        inputText = "";
-                    } else {
-                        p2NameInput = inputText;
-                        SDL_StopTextInput();
-                        resetGame();
-                        currentState = PLAYING;
-                    }
-                } else if (event.key.keysym.sym == SDLK_BACKSPACE && inputText.length() > 0) {
-                    inputText.pop_back();
-                }
-            }
             else if (currentState == PLAYING) {
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     currentState = PAUSED;
@@ -449,16 +373,48 @@ void Game::handleEvents(SDL_Event& event) {
             }
             else if (currentState == SERVER_IP_INPUT) {
                 if (event.key.keysym.sym == SDLK_RETURN) {
-                    ipInput = inputText;
-                    net.setSignalingServer(ipInput);
-                    SDL_StopTextInput();
-                    currentState = MENU;
+                    // Parse "IP:Port" from inputText
+                    std::string ipStr;
+                    int port = 0;
+                    
+                    size_t colonPos = inputText.find(':');
+                    if (colonPos != std::string::npos) {
+                        // Format: IP:Port
+                        ipStr = inputText.substr(0, colonPos);
+                        try {
+                            port = std::stoi(inputText.substr(colonPos + 1));
+                        } catch (...) { port = 0; }
+
+                        // Smart Loopback: If user enters their OWN Public IP, force Localhost.
+                        // This fixes NAT Hairpinning issues when testing on the same machine.
+                        if (ipStr == net.myPublicIP) {
+                            ipStr = "127.0.0.1";
+                            std::cout << "Detected Own Public IP -> Switching to Localhost (127.0.0.1) for Loopback" << std::endl;
+                        }
+                    } else {
+                        // Shortcut: Port Only -> Use Localhost (127.0.0.1)
+                        // This ensures testing on the same machine ALWAYS works, avoiding NAT Hairpinning issues.
+                        ipStr = "127.0.0.1";
+                        try {
+                            port = std::stoi(inputText);
+                        } catch (...) { port = 0; }
+                    }
+                    
+                    if (port > 0 && port < 65536) {
+                        // Set Peer!
+                        net.setPeer(ipStr, port);
+                        net.sendPunch();
+                    }
+                    // Don't clear inputText immediately so user can see it, or clear it?
+                    // inputText = ""; 
                 }
                 if (event.key.keysym.sym == SDLK_BACKSPACE && inputText.length() > 0) {
                     inputText.pop_back();
                 }
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     SDL_StopTextInput();
+                    isOnline = false;
+                    net.disconnect();
                     currentState = MENU;
                 }
             }
@@ -521,20 +477,50 @@ void Game::handleEvents(SDL_Event& event) {
 }
 
 
-void Game::update() {
 
+
+
+void Game::update() {
     // Timer Logic
     if (ignoreInputFrames > 0) ignoreInputFrames--;
 
-    // Auto-transition Host to Lobby
-    if (currentState == MENU && isOnline && net.isHost && net.connected) {
-        SDL_Delay(500); // Brief delay to see "Connected" message
-        currentState = CHARACTER_SELECT;
+    // Update Reliability Layer (Retransmissions) & Heartbeat
+    if (isOnline) {
+        net.update();
     }
+
+    if (currentState == SERVER_IP_INPUT) {
+         // Auto-transition when connected via Punch
+         // Must process incoming packets to receive the PUNCH!
+         if (isOnline) {
+             Packet p;
+             while(net.receive(p)) {
+                 // Discard data, we just want to process the PUNCH which sets net.connected
+             }
+         }
+
+         if (net.connected) {
+             SDL_StopTextInput();
+             currentState = CHARACTER_SELECT; // Go to Lobby
+             // Set names to default so we don't start blank
+             p1NameInput = "Host";
+             p2NameInput = "Client";
+         } else if (net.hasPeer) {
+             // We have a peer target, so spam PUNCH packets every frame (or every few frames)
+             net.sendPunch();
+         }
+    }
+
+    // ... (Inside CHARACTER_SELECT) ...
+
 
     if (currentState == CHARACTER_SELECT) {
         if (isOnline) {
-            if (!net.connected) {
+             if (net.hasPeer && !net.connected) {
+                 net.sendPunch(); // Keep punching until fully connected logic takes over in NetworkManager
+             }
+
+            if (!net.connected && !net.hasPeer) { // If connected flag drops and we aren't trying to connect
                 // Peer disconnected
                 isOnline = false;
                 currentState = MENU;
@@ -545,25 +531,20 @@ void Game::update() {
                 p2NameInput = "Player 2";
             }
             else if (net.isHost) {
-                // Host sends P1 choice and Game State (to trigger start)
-                // Host sends P1 choice, Name, Ready Status
+                // Host Logic (Same as before but over UDP)
+                // ...
                 Packet p;
-                p.type = 2; // State (using same type for lobby sync)
+                p.type = 2; // State 
                 p.gameState = CHARACTER_SELECT;
                 p.p1Char = p1Character;
                 strncpy(p.p1Name, p1NameInput.c_str(), 19); p.p1Name[19] = '\0';
                 p.p1Ready = p1Ready;
-                
-                // Host also echoes P2 data back to P2 (so P2 knows Host knows)
-                // Actually P2 sends its data to Host. Host just needs to receive it.
-                // But Host is Authority.
-                
-                // Let's just send P1 data for now.
-                net.send(p);
+                // Sync Timer to Client
+                p.startTimer = countingDown ? lobbyStartTimer : -1.0f;
+                net.send(p); // UDP Send
 
-                // Receive P2 choice, Name, Ready Status
                 Packet p2P;
-                // Process all incoming packets
+                // UDP receive returns true if packet matches our protocol
                 for (; net.receive(p2P); ) {
                     if (p2P.type == 2) {
                         p2Character = p2P.p2Char;
@@ -572,23 +553,46 @@ void Game::update() {
                     }
                 }
                 
+
                 // Check Start Condition
                 if (p1Ready && p2Ready) {
-                    // Both Ready! Start Game!
-                    Packet startP;
-                    startP.type = 3; // Start Game
-                    net.send(startP);
-                    
-                    // Set names in Player objects
-                    players[0].name = p1NameInput;
-                    players[1].name = p2NameInput;
-                    
-                    resetGame();
-                    currentState = PLAYING;
+                     if (!countingDown) {
+                         countingDown = true;
+                         lobbyStartTimer = 3.9f; // Start closer to 4 so it shows 3 immediately
+                     }
+                } else {
+                     countingDown = false;
+                     lobbyStartTimer = 0.0f;
+                }
+                
+                if (countingDown) {
+                     lobbyStartTimer -= 1.0f / 60.0f; // Approx 60 FPS
+                     if (lobbyStartTimer <= 0) {
+                         // TIME'S UP -> START GAME!
+                         std::cout << "Both Ready! Starting Game..." << std::endl;
+                         
+                         // 1. Send Start Packet to Client (Reliable)
+                         Packet startP;
+                         startP.type = 3; // Start Game
+                         startP.gameTime = GameConstants::GAME_DURATION;
+                         strncpy(startP.p1Name, p1NameInput.c_str(), 19);
+                         
+                         net.sendReliable(startP);
+                         
+                         // 2. Start Local Game
+                         players[0].name = p1NameInput;
+                         players[1].name = p2NameInput;
+                         resetGame();
+                         currentState = PLAYING;
+                         return;
+                     }
                 }
 
+                Packet stateP;
+ 
             } else {
-                // Client sends P2 choice, Name, Ready Status
+                // Client Logic (UDP)
+                // ...
                 Packet p;
                 p.type = 2;
                 p.p2Char = p2Character;
@@ -596,11 +600,9 @@ void Game::update() {
                 p.p2Ready = p2Ready;
                 net.send(p);
 
-                // Receive P1 choice, Name, Ready Status
                 Packet hostP;
                 for (; net.receive(hostP); ) {
                     if (hostP.type == 2) {
-                        // Check if Host has already started the game
                         if (hostP.gameState == PLAYING) {
                              players[0].name = p1NameInput; // Use last known name
                              players[1].name = p2NameInput;
@@ -608,12 +610,14 @@ void Game::update() {
                              currentState = PLAYING;
                              return;
                         }
-
                         p1Character = hostP.p1Char;
                         p1NameInput = hostP.p1Name;
                         p1Ready = hostP.p1Ready;
+                        // Client Receives Timer
+                        lobbyStartTimer = hostP.startTimer;
                     } else if (hostP.type == 3) {
-                         // Host started the game!
+                         // Received RELIABLE Start Packet
+                         // net.receive() sends ACK automatically for Type 3
                          players[0].name = p1NameInput;
                          players[1].name = p2NameInput;
                          resetGame();
@@ -623,14 +627,16 @@ void Game::update() {
                 }
             }
         } else {
-            // Local Play Start Logic
-            if (p1Ready && p2Ready) { // Require both ready for local too
-                 isOnline = false; // Ensure we are offline
+             // Local logic...
+             if (p1Ready && p2Ready) {
+                 isOnline = false;
                  players[0].name = p1NameInput;
                  players[1].name = p2NameInput;
                  resetGame();
                  currentState = PLAYING;
-            }
+             } else if (p1Ready && !p2Ready) {
+                 // Maybe wait for P2? Or force start?
+             }
         }
     }
 
@@ -679,7 +685,8 @@ void Game::update() {
                 }
                 
                 // Update Game Logic (Host Authority)
-                // ... (Existing update logic below) ...
+                // Physics happens at the end of Game::update via player.update()
+                
                 Packet stateP;
                 stateP.type = 2; // Game State
                 stateP.gameTime = gameTime;
@@ -1155,7 +1162,6 @@ void Game::render() {
                 renderCenteredText(250, "Press H to HOST Game", {255, 255, 255, 255}, font);
                 renderCenteredText(300, "Press J to JOIN Game", {255, 255, 255, 255}, font);
                 renderCenteredText(350, "Press L for LOCAL Game", {200, 200, 200, 255}, font);
-                renderCenteredText(400, "Press S to Set Server IP", {100, 100, 100, 255}, font);
                 if (!signalingError.empty()) {
                     renderCenteredText(450, signalingError, {255, 0, 0, 255}, font);
                 }
@@ -1194,60 +1200,97 @@ void Game::render() {
     }
     else if (currentState == SERVER_IP_INPUT) {
         if (font) {
-            renderCenteredText(200, "Signaling Server IP", {255, 255, 255, 255}, font);
-            renderCenteredText(250, "(Default: 127.0.0.1)", {150, 150, 150, 255}, font);
-            renderCenteredText(300, inputText + "_", {0, 255, 255, 255}, font);
-            renderCenteredText(400, "Press ENTER to Save", {200, 200, 200, 255}, font);
+            // New UI: Two-Way Code Exchange
+            // New UI: Two-Way Code Exchange
+            // 1. Show MY Code
+            std::string myCode = net.myPublicIP + ":" + std::to_string(net.myPublicPort);
+            
+            // If I am Host (P1), I need Client's code. If I am Client (P2), I need Host's code.
+            
+            // If I am Host (P1), I need Client's code. If I am Client (P2), I need Host's code.
+            
+            // Removed dark overlay to match Menu aesthetics (First Page Colors)
+            // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 240); 
+            // SDL_RenderFillRect(renderer, NULL);  
+            
+            // Use 'font' (smaller) for the code to ensure it fits, or layout better.
+            // Title
+            renderCenteredText(80, "Your Join Code (Internet):", {255, 255, 255, 255}, font);
+            
+            // The Code itself (Green, distinct)
+            renderCenteredText(110, myCode.empty() ? "Discovering..." : myCode, {0, 255, 0, 255}, font);
+
+            // Local Port (For Same-PC / LAN)
+            std::string localCode = "Local Port: " + std::to_string(net.myLocalPort);
+            renderCenteredText(140, localCode, {100, 255, 100, 255}, font);
+            renderCenteredText(160, "(Use this if playing on SAME PC)", {150, 150, 150, 255}, font);
+            
+            SDL_DisplayMode dm;
+            // Visual Separator
+            drawRect(renderer, 200, 200, 400, 2, {100, 100, 100, 255});
+
+            renderCenteredText(250, "Enter Friend's Code:", {255, 255, 255, 255}, font);
+            renderCenteredText(300, inputText + "_", {0, 255, 255, 255}, font); // Input in Cyan
+            
+            renderCenteredText(450, "Share CODES via Message App", {150, 150, 150, 255}, font);
+            renderCenteredText(500, "Then Press ENTER to Connect", {255, 255, 0, 255}, font);
         }
     }
     else if (currentState == CHARACTER_SELECT) {
-        // Background
+        // ... (CHARACTER_SELECT Rendering remains mostly same, but check connection status)
         SDL_SetRenderDrawColor(renderer, 30, 30, 40, 255);
         SDL_RenderClear(renderer);
 
         renderCenteredText(50, "LOBBY", {255, 255, 0, 255}, titleFont);
-
-        // Player 1 Section (Left)
-        std::string p1Str = (p1Character == 0) ? "< Boy >" : "< Girl >";
-        renderText(100, 150, "Player 1 (Host)", {0, 255, 255, 255}, font);
-        renderText(100, 200, p1Str, {255, 255, 255, 255}, font);
-        renderText(100, 250, "Name: " + p1NameInput + (typingName && (isOnline ? net.isHost : true) ? "_" : ""), {255, 255, 255, 255}, font);
-        renderText(100, 300, p1Ready ? "READY!" : "Not Ready", p1Ready ? SDL_Color{0, 255, 0, 255} : SDL_Color{255, 0, 0, 255}, font);
-
-        // Player 2 Section (Right)
-        std::string p2Str = (p2Character == 0) ? "< Boy >" : "< Girl >";
-        renderText(500, 150, "Player 2 (Client)", {255, 100, 100, 255}, font);
-        renderText(500, 200, p2Str, {255, 255, 255, 255}, font);
-        renderText(500, 250, "Name: " + p2NameInput + (typingName && (isOnline ? !net.isHost : false) ? "_" : ""), {255, 255, 255, 255}, font);
-        renderText(500, 300, p2Ready ? "READY!" : "Not Ready", p2Ready ? SDL_Color{0, 255, 0, 255} : SDL_Color{255, 0, 0, 255}, font);
-
-        // Instructions
-        renderCenteredText(450, "Press 'T' to Type Name", {200, 200, 200, 255}, font);
-        renderCenteredText(500, "Press 'ENTER' to Toggle Ready", {200, 200, 200, 255}, font);
         
-        if (p1Ready && p2Ready) {
-             if (!isOnline || net.isHost) {
-                renderCenteredText(550, "Starting Game...", {0, 255, 0, 255}, font);
-             } else {
-                renderCenteredText(550, "Waiting for Host...", {0, 255, 0, 255}, font);
+        if (!net.connected) {
+             renderCenteredText(250, "Connecting to Peer...", {255, 100, 0, 255}, font);
+             renderCenteredText(300, "Keep Game Open!", {255, 255, 255, 255}, font);
+             // Periodically send punch here in update loop
+        } else {
+             // ... Normal Lobby UI ...
+             // Player 1 Section (Left)
+             std::string p1Str = (p1Character == 0) ? "< Boy >" : "< Girl >";
+             renderText(100, 150, "Player 1 (Host)", {0, 255, 255, 255}, font);
+             renderText(100, 200, p1Str, {255, 255, 255, 255}, font);
+             renderText(100, 250, "Name: " + p1NameInput + (typingName && (isOnline ? net.isHost : true) ? "_" : ""), {255, 255, 255, 255}, font);
+             renderText(100, 300, p1Ready ? "READY!" : "Not Ready", p1Ready ? SDL_Color{0, 255, 0, 255} : SDL_Color{255, 0, 0, 255}, font);
+             
+             // Player 2 Section (Right)
+             std::string p2Str = (p2Character == 0) ? "< Boy >" : "< Girl >";
+             renderText(500, 150, "Player 2 (Client)", {255, 100, 100, 255}, font);
+             renderText(500, 200, p2Str, {255, 255, 255, 255}, font);
+             renderText(500, 250, "Name: " + p2NameInput + (typingName && (isOnline ? !net.isHost : false) ? "_" : ""), {255, 255, 255, 255}, font);
+             renderText(500, 300, p2Ready ? "READY!" : "Not Ready", p2Ready ? SDL_Color{0, 255, 0, 255} : SDL_Color{255, 0, 0, 255}, font);
+
+             // Instructions
+             renderCenteredText(450, "Press 'T' to Type Name", {200, 200, 200, 255}, font);
+             renderCenteredText(500, "Press 'ENTER' or 'SPACE' to Toggle Ready", {200, 200, 200, 255}, font);
+             
+             if (p1Ready && p2Ready) {
+                  if (lobbyStartTimer > 0) {
+                      // Countdown!
+                      std::string countStr = std::to_string((int)lobbyStartTimer);
+                      if (lobbyStartTimer > 0 && lobbyStartTimer < 1.0f) countStr = "GO!";
+                      
+                      // Draw BIG centered text
+                      // Cheap way to make it big: Draw it multiple times with offsets or use titleFont
+                      if (titleFont) {
+                          renderCenteredText(400, countStr, {255, 255, 0, 255}, titleFont);
+                      } else {
+                          renderCenteredText(400, countStr, {255, 255, 0, 255}, font);
+                      }
+                  } else {
+                       if (!isOnline || net.isHost) {
+                          renderCenteredText(550, "Starting Game...", {0, 255, 0, 255}, font);
+                       } else {
+                          renderCenteredText(550, "Waiting for Host...", {0, 255, 0, 255}, font);
+                       }
+                  }
              }
         }
     }
-    else if (currentState == NAME_INPUT) {
-        drawRect(renderer, 100, 100, 600, 300, {255, 255, 255, 255});
-        if (font) {
-            if (inputtingP1) {
-                renderText(200, 150, "Enter Player 1 Name:", {0, 0, 0, 255}, font);
-                renderText(200, 200, inputText + "_", {0, 0, 255, 255}, font);
-                renderText(200, 300, "(Default: Xeno/Zeni)", {100, 100, 100, 255}, font);
-            } else {
-                renderText(200, 150, "Enter Player 2 Name:", {0, 0, 0, 255}, font);
-                renderText(200, 200, inputText + "_", {255, 0, 0, 255}, font);
-                renderText(200, 300, "(Default: Xeno/Zeni)", {100, 100, 100, 255}, font);
-            }
-            renderText(250, 350, "Press SPACE to Confirm", {0, 0, 0, 255}, font);
-        }
-    }
+
     else if (currentState == PLAYING || currentState == PAUSED) {
         // Draw Platforms
         for (size_t i = 0; i < platforms.size(); ++i) {
@@ -1338,8 +1381,8 @@ void Game::render() {
         
         if (font) {
             std::string winner;
-            if (winnerId == 1) winner = players[0].name + " Wins!";
-            else if (winnerId == 2) winner = players[1].name + " Wins!";
+            if (winnerId == 1 && players.size() > 0) winner = players[0].name + " Wins!";
+            else if (winnerId == 2 && players.size() > 1) winner = players[1].name + " Wins!";
             else winner = "It's a Draw!";
             
             renderCenteredText(300, winner, {255, 255, 255, 255}, font);

@@ -62,11 +62,9 @@ build_target() {
     fi
 }
 
-# Build Game and Server
+# Build Game
 build_target "amphitude" "src/*.cpp"
-build_target "server_app" "server/main.cpp"
 
 echo ""
 echo "🎉 Build Complete!"
 echo "👉 Run Game:   ./amphitude$OUTPUT_EXT"
-echo "👉 Run Server: ./server_app$OUTPUT_EXT"

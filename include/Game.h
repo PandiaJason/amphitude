@@ -24,7 +24,7 @@
 class Game {
 public:
     /** @brief Game states */
-    enum GameState { MENU, CHARACTER_SELECT, NAME_INPUT, PLAYING, PAUSED, GAMEOVER, EXIT_CONFIRM, SERVER_IP_INPUT };
+    enum GameState { MENU, CHARACTER_SELECT, PLAYING, PAUSED, GAMEOVER, EXIT_CONFIRM, SERVER_IP_INPUT };
 
     Game();
     ~Game();
@@ -82,7 +82,6 @@ private:
     
     // Name Input
     std::string inputText;
-    bool inputtingP1;
     int winnerId = 0; // 0 = None/Draw, 1 = P1, 2 = P2
     int ignoreInputFrames = 0; // To prevent immediate key capture
     
@@ -91,6 +90,8 @@ private:
     bool waitingForCode = false;
     std::string signalingError;
     bool enteringCode = false; // For Join menu
+    float lobbyStartTimer = 0.0f; // For 3-second countdown
+    bool countingDown = false;
 
 
     // Timer
