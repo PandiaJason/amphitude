@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <SDL2/SDL_image.h>
 
 Game::Game() : window(nullptr), renderer(nullptr), font(nullptr), titleFont(nullptr),
@@ -41,6 +42,10 @@ bool Game::init() {
 
     // Create the renderer (hardware accelerated, vsync enabled)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        std::cerr << "Accelerated Init Failed (" << SDL_GetError() << "). Trying Software Renderer..." << std::endl;
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+    }
     if (!renderer) return false;
 
     loadAssets();
@@ -385,12 +390,11 @@ void Game::handleEvents(SDL_Event& event) {
                             port = std::stoi(inputText.substr(colonPos + 1));
                         } catch (...) { port = 0; }
 
-                        // Smart Loopback: If user enters their OWN Public IP, force Localhost.
-                        // This fixes NAT Hairpinning issues when testing on the same machine.
-                        if (ipStr == net.myPublicIP) {
-                            ipStr = "127.0.0.1";
-                            std::cout << "Detected Own Public IP -> Switching to Localhost (127.0.0.1) for Loopback" << std::endl;
-                        }
+                        // Smart Loopback: DISABLED to test Hairpin NAT
+                        // if (ipStr == net.myPublicIP) {
+                        //    ipStr = "127.0.0.1";
+                        //    std::cout << "Detected Own Public IP -> Switching to Localhost (127.0.0.1) for Loopback" << std::endl;
+                        // }
                     } else {
                         // Shortcut: Port Only -> Use Localhost (127.0.0.1)
                         // This ensures testing on the same machine ALWAYS works, avoiding NAT Hairpinning issues.

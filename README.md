@@ -1,6 +1,6 @@
 # amphitude
 
-**amphitude** is a high-octane, **serverless P2P** 2D multiplayer platform fighter built from scratch with C++ and SDL2. It blends retro pixel-art aesthetics with modern, fast-paced combat mechanics.
+**amphitude** is a high-octane, **Serverless P2P** 2D multiplayer platform fighter built from scratch with C++ and SDL2. It blends retro pixel-art aesthetics with modern, fast-paced combat mechanics.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Language](https://img.shields.io/badge/language-C%2B%2B17-blue.svg)
@@ -14,45 +14,29 @@
 ### 🎮 Gameplay
 *   **Intense PvP Combat**: Battle your friends in 1v1 duels.
 *   **True P2P Multiplayer**: No servers, no accounts, no lag. Connect directly via UDP Hole Punching.
-*   **Unique Characters**:
-    *   **Xeno**: A Playable Character -> Male.
-    *   **Zeni**: A Playable Character -> Female.
+*   **Unique Characters**: Xeno (Boy) & Zeni (Girl).
 *   **Dynamic Physics**: Master double jumps, wall jumps, and momentum-based movement.
-*   **Power-Ups**: Turn the tide with random spawns like **Health Packs**, **Dragon Suit** (fireball), and **Rhino Suit** (2x damage).
 *   **Lobby System**: Countdown timer (3... 2... 1... GO!) ensures fair starts.
 
 ### 🛠️ Technical
 *   **Custom Engine**: Built on top of SDL2 for maximum performance.
 *   **UDP Networking**: Custom reliable UDP protocol with NAT Hole Punching (STUN).
-*   **Serverless**: Zero backend infrastructure required.
+*   **Zero Backend**: No servers required. Players connect directly.
 
 ---
 
 ## 🛠️ Installation & Build Guide
 
-### ⚡ Quick Start
-1.  **Install Dependencies** (see below).
+### ⚡ Quick Start (Mac/Linux)
+1.  **Install Dependencies** (SDL2, SDL2_image, SDL2_ttf, SDL2_net).
 2.  **Run Build Script**: `./build.sh`
 3.  **Play**: `./amphitude`
-
-### 📦 Dependency Installation
-
-#### 🍎 macOS
-```bash
-brew install sdl2 sdl2_image sdl2_ttf sdl2_net
-```
-
-#### 🐧 Linux (Debian/Ubuntu)
-```bash
-sudo apt update
-sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev
-```
 
 ---
 
 ## 🌐 How to Play Online (Covai <-> Chennai Protocol)
 
-Amphitude uses **Serverless P2P** technology to connect players directly over the internet without a central server.
+Amphitude connects players directly over the internet using **UDP Hole Punching**.
 
 ### 1. Host (Player A)
 1.  Run `./amphitude` and press **H** (Host).
@@ -73,6 +57,35 @@ Amphitude uses **Serverless P2P** technology to connect players directly over th
 
 ---
 
+## 🐳 Docker Support (Linux Testing)
+
+You can run the Linux version of the game inside Docker to verify cross-platform compatibility or simulate a network peer.
+
+### 1. Build & Run
+We provide a helper script to build the image and run it with X11 forwarding (GUI support).
+
+**Prerequisites (macOS):**
+*   **Docker Desktop** installed.
+*   **XQuartz** installed (`brew install --cask xquartz`) and running.
+    *   *Ensure "Allow connections from network clients" is checked in XQuartz settings.*
+
+**Command:**
+```bash
+./run_docker.sh
+```
+
+### 2. Testing Connection (Mac vs Docker)
+Since both run on the same physical router, you must use **NAT Hairpinning** (Green Codes) or Manual Localhost mapping.
+
+*   **Mac**: `./amphitude` (Runs on Port 50000)
+*   **Docker**: `./run_docker.sh` (Maps Internal 50000 -> Host 50001)
+
+**To Connect:**
+*   **Mac**: Enter `127.0.0.1:50001` (Connect to Docker)
+*   **Docker**: Enter `host.docker.internal:50000` (Connect to Mac)
+
+---
+
 ## 🕹️ Controls
 
 | Action | Player 1 (Host/Local) | Player 2 (Client/Local) |
@@ -80,14 +93,8 @@ Amphitude uses **Serverless P2P** technology to connect players directly over th
 | **Move** | `W`, `A`, `S`, `D` | `Arrow Keys` |
 | **Jump** | `W` (Double Jump) | `Up Arrow` (Double Jump) |
 | **Attack** | `F` | `Enter` |
+| **Ready** | `Space` / `Enter` | `Space` / `Enter` |
 | **Pause** | `Esc` | `Esc` |
-
-**Menu Shortcuts:**
-*   **H**: Host Online Game
-*   **J**: Join Online Game (Client)
-*   **L**: Local 1v1 Game
-*   **Enter / Space**: Toggle Ready (Lobby)
-*   **Esc**: Quit / Back
 
 ---
 
