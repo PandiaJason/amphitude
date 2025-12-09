@@ -54,28 +54,24 @@ StunClient::StunResult StunClient::getPublicAddress(UDPsocket socket, const std:
         if (SDLNet_UDP_Send(socket, -1, packet) == 0) continue;
         
         // Wait for response (Timeout 1 sec)
+        // Wait for response (Timeout 1 sec)
         Uint32 start = SDL_GetTicks();
+        bool responseReceived = false;
+        
         for (; SDL_GetTicks() - start < 1000; ) { // 1 sec timeout
             if (SDLNet_UDP_Recv(socket, packet)) {
-                // Check IP first? No, we might intercept other packets. 
-                // Just check payload.
+                // Check if it's a valid STUN Binding Response (0x0101)
                 if (packet->len >= 20 && packet->data[0] == 0x01 && packet->data[1] == 0x01) {
-                    // Success Binding Response (0x0101)
-                    // Verify transaction ID? (Skip for simplicity)
-                    // break; // Break from inner loop to process packet
-                    // The original code had a break here, but the new structure implies processing it directly.
-                } else {
-                    // Not a STUN Binding Response, or too short.
-                    // Clear packet length to indicate it's not valid for further processing.
-                    packet->len = 0; 
+                    responseReceived = true;
+                    break; // Found it!
                 }
-                break; // Break from inner loop if a packet was received (valid or not)
+                // If not valid, just ignore and keep listening (continue loop)
             }
             SDL_Delay(10);
         }
 
-        if (packet->len == 0) {
-             // Timeout or invalid packet received
+        if (!responseReceived) {
+             // Timeout or no valid response
              continue; // Try next server
         }
 
