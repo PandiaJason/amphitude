@@ -4,7 +4,7 @@
 
 ![Language](https://img.shields.io/badge/language-C%2B%2B17-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey?style=for-the-badge&logo=linux&logoColor=black)
-![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![License](https://img.shields.io/badge/license-GPLv2-blue?style=for-the-badge)
 ![Network](https://img.shields.io/badge/network-Serverless%20P2P-orange?style=for-the-badge)
 
 **A high-octane, serverless multiplayer platform fighter built from scratch with C++ and SDL2.**
@@ -149,6 +149,6 @@ amphitude/
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU General Public License v2.0 (GPLv2)** - see the [LICENSE](LICENSE) file for details.
 
 Copyright © 2025 **Amphitainments**
