@@ -53,22 +53,36 @@ StunClient::StunResult StunClient::getPublicAddress(UDPsocket socket, const std:
     for(int i=0; i<3 && !found; ++i) {
         if (SDLNet_UDP_Send(socket, -1, packet) == 0) continue;
         
-        // Wait for response with timeout
+        // Wait for response (Timeout 1 sec)
         Uint32 start = SDL_GetTicks();
-        while(SDL_GetTicks() - start < 1000) { // 1 sec timeout
+        for (; SDL_GetTicks() - start < 1000; ) { // 1 sec timeout
             if (SDLNet_UDP_Recv(socket, packet)) {
                 // Check IP first? No, we might intercept other packets. 
                 // Just check payload.
                 if (packet->len >= 20 && packet->data[0] == 0x01 && packet->data[1] == 0x01) {
                     // Success Binding Response (0x0101)
                     // Verify transaction ID? (Skip for simplicity)
-                    result = parseResponse(packet->data, packet->len);
-                    found = true;
-                    break;
+                    // break; // Break from inner loop to process packet
+                    // The original code had a break here, but the new structure implies processing it directly.
+                } else {
+                    // Not a STUN Binding Response, or too short.
+                    // Clear packet length to indicate it's not valid for further processing.
+                    packet->len = 0; 
                 }
+                break; // Break from inner loop if a packet was received (valid or not)
             }
             SDL_Delay(10);
         }
+
+        if (packet->len == 0) {
+             // Timeout or invalid packet received
+             continue; // Try next server
+        }
+
+        // Parse Response
+        result = parseResponse(packet->data, packet->len);
+        found = true;
+
     }
     
     SDLNet_FreePacket(packet);
@@ -79,7 +93,7 @@ StunClient::StunResult StunClient::parseResponse(const Uint8* data, int len) {
     // Parse Attributes
     int offset = 20; // Skip Header
     
-    while(offset < len) {
+    for(;offset < len;) {
         if (offset + 4 > len) break;
         
         Uint16 type = (data[offset] << 8) | data[offset+1];

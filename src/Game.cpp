@@ -203,7 +203,8 @@ void Game::spawnPowerUps() {
 
 void Game::handleEvents(SDL_Event& event) {
     // Poll events using for(;;) loop
-    while (SDL_PollEvent(&event)) {
+    // Poll events using for(;;) loop
+    for (; SDL_PollEvent(&event); ) {
         if (event.type == SDL_QUIT) running = false;
         else if (event.type == SDL_TEXTINPUT) {
             if (ignoreInputFrames > 0) {
@@ -498,7 +499,7 @@ void Game::update() {
          // Must process incoming packets to receive the PUNCH!
          if (isOnline) {
              Packet p;
-             while(net.receive(p)) {
+             for (; net.receive(p); ) {
                  // Discard data, we just want to process the PUNCH which sets net.connected
              }
          }
