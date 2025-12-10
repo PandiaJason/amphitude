@@ -21,6 +21,17 @@
 
 Combined with a custom physics engine and pixel-perfect rendering, it offers a raw, competitive arcade experience reminiscent of classic fighters.
 
+## 📸 Gallery
+
+<p align="center">
+  <img src="screenshots/menu.png" width="45%" alt="Main Menu">
+  <img src="screenshots/gameplay.png" width="45%" alt="Gameplay">
+</p>
+<p align="center">
+  <img src="screenshots/lobby.png" width="45%" alt="Lobby">
+  <img src="screenshots/connect_host.png" width="45%" alt="Connection">
+</p>
+
 ## ✨ Features
 
 *   **⚔️ True Serverless P2P**: Direct client-to-client connection via UDP Hole Punching. Zero backend infrastructure required.
