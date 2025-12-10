@@ -1248,7 +1248,7 @@ void Game::render() {
 
         renderCenteredText(50, "LOBBY", {255, 255, 0, 255}, titleFont);
         
-        if (!net.connected) {
+        if (isOnline && !net.connected) {
              renderCenteredText(250, "Connecting to Peer...", {255, 100, 0, 255}, font);
              renderCenteredText(300, "Keep Game Open!", {255, 255, 255, 255}, font);
              // Periodically send punch here in update loop
