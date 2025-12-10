@@ -53,6 +53,20 @@ sudo apt install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev l
 sudo pacman -S base-devel sdl2 sdl2_image sdl2_ttf sdl2_net
 ```
 
+**Windows (MSYS2) - Recommended**
+1.  Install [MSYS2](https://www.msys2.org/).
+2.  Open `MSYS2 UCRT64` terminal.
+3.  Install Dependencies:
+    ```bash
+    pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-sdl2 mingw-w64-ucrt-x86_64-sdl2_image mingw-w64-ucrt-x86_64-sdl2_ttf mingw-w64-ucrt-x86_64-sdl2_net
+    ```
+4.  Run `./build.sh`
+
+**Windows (CMD/MinGW)**
+1.  Install MinGW-w64 (e.g. via w64devkit).
+2.  Ensure `g++` is in your PATH.
+3.  Double-click `build.bat` (assuming libraries are setup).
+
 ### Compile from Source
 
 We provide a universal build script that detects your OS and links the appropriate libraries.
