@@ -139,7 +139,7 @@ Amphitude uses a unique **"Join Code"** system to bypass firewalls.
 4.  **CONNECT**: Both players enter the **Other Person's Code** and press `ENTER`.
 5.  **FIGHT**: The game punches through the NAT and starts the session.
 
-### 🕹 Controls
+### 🕹 Controls & Shortcuts
 
 | Action | Player 1 (Host) | Player 2 (Client/Local) |
 | :--- | :--- | :--- |
@@ -147,7 +147,35 @@ Amphitude uses a unique **"Join Code"** system to bypass firewalls.
 | **Jump** | `W` (Double Jump) | `Up Arrow` (Double Jump) |
 | **Attack** | `F` | `Enter` |
 | **Ready** | `Space` / `Enter` | `Space` / `Enter` |
-| **Pause** | `Esc` | `Esc` |
+| **Menu: Toggle Season** | `S` (Forest/Arctic) | - |
+| **Menu: Local Mode** | `L` | - |
+
+### 💥 Power-Ups & Mechanics
+
+*   **🔥 Dragon Potion (Fire)**:
+    *   **Ability**: Shoot Fireballs (`F`/`Enter`).
+    *   **Flight**: Hold Jump to glide/hover. (Only available in Dragon form).
+*   **🛡️ Rhino Potion (Shield)**:
+    *   **Ability**: Dash Attack (`F`/`Enter`). Deals massive damage.
+    *   **Passive**: Immune to the first hit (which breaks the shield).
+*   **❤️ Health**: Restores HP.
+
+**Win Conditions:**
+1.  **KO**: Reduce opponent's HP to 0.
+2.  **Time Out**: Player with higher HP wins when time expires.
+3.  **Sudden Death**: If HP is equal at timeout, next hit wins (Draw).
+
+---
+
+## ❓ Troubleshooting
+
+**macOS: "App cannot be opened because the developer cannot be verified"**
+1.  Right-click the App -> Click **Open**.
+2.  Click **Open** in the dialog box.
+*(This bypasses Apple's Gatekeeper for non-App Store apps).*
+
+**Linux: "Error loading shared libraries: libSDL2..."**
+Ensure you have installed the dependencies listed in the [Prerequisites](#prerequisites) section.
 
 ---
 
