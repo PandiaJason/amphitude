@@ -1,22 +1,17 @@
-# Build artifacts
-amphitude
-server_app
-*.exe
-game
-server/server_app
-*.o
-*.dSYM/
+# Build Artifacts
 build/
-*.dmg
-_CPack_Packages/
-install_manifest.txt
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+bin/
 amphitude
-server_app
+*.o
+*.app
+*.dmg
+*.tar.gz
+
+# Directories
+amphitude_releases/
+packaging/mac/
+packaging/linux/
+
+# System
+.DS_Store
+.vscode/
