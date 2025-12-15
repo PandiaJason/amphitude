@@ -44,6 +44,19 @@ public:
     void run();
 
 private:
+    // Season Support
+    enum Season { SEASON_GREEN, SEASON_SNOW };
+    Season currentSeason;
+
+    bool inputtingP1;
+    bool p1Ready;
+    bool p2Ready;
+    float lobbyStartTimer;
+    bool countingDown;
+    std::string p1NameInput;
+    std::string p2NameInput;
+    bool typingName;
+
     // SDL Core
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -51,17 +64,29 @@ private:
     // Resources
     TTF_Font* font;
     TTF_Font* titleFont;
+
+    // Textures
     SDL_Texture* boyTexture;
     SDL_Texture* girlTexture;
     SDL_Texture* boyDragonTexture;
-    SDL_Texture* girlDragonTexture;
     SDL_Texture* boyRhinoTexture;
+    SDL_Texture* girlDragonTexture;
     SDL_Texture* girlRhinoTexture;
-    SDL_Texture* backgroundTexture;
-    SDL_Texture* mudTileTexture;
     SDL_Texture* crystalTexture;
-    int boyW = 0, boyH = 0;
-    int girlW = 0, girlH = 0;
+    
+    // Backgrounds & Tiles
+    SDL_Texture* bgGreenTexture;
+    SDL_Texture* bgSnowTexture;
+    SDL_Texture* tileGreenTexture;
+    SDL_Texture* tileSnowTexture;
+
+    // Active Texture Pointers (for convenience)
+    SDL_Texture* backgroundTexture; 
+    SDL_Texture* mudTileTexture; 
+
+    // Player Dimensions (for sprite sheet calculation)
+    int boyW, boyH;
+    int girlW, girlH;
 
     // Game State
     GameState currentState;
@@ -74,12 +99,7 @@ private:
     std::string ipInput = "127.0.0.1";
     int p1Character; // 0 = Boy, 1 = Girl
     int p2Character; // 0 = Boy, 1 = Girl
-    bool p1Ready = false;
-    bool p2Ready = false;
-    std::string p1NameInput = "Player 1";
-    std::string p2NameInput = "Player 2";
-    bool typingName = false; // To toggle typing mode
-    
+
     // Name Input
     std::string inputText;
     int winnerId = 0; // 0 = None/Draw, 1 = P1, 2 = P2
@@ -90,8 +110,6 @@ private:
     bool waitingForCode = false;
     std::string signalingError;
     bool enteringCode = false; // For Join menu
-    float lobbyStartTimer = 0.0f; // For 3-second countdown
-    bool countingDown = false;
 
 
     // Timer

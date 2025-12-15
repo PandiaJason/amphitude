@@ -10,6 +10,9 @@ Game::Game() : window(nullptr), renderer(nullptr), font(nullptr), titleFont(null
              boyTexture(nullptr), girlTexture(nullptr), boyDragonTexture(nullptr), girlDragonTexture(nullptr),
     boyRhinoTexture(nullptr), girlRhinoTexture(nullptr), backgroundTexture(nullptr),
              crystalTexture(nullptr),
+             bgGreenTexture(nullptr), bgSnowTexture(nullptr),
+             tileGreenTexture(NULL), tileSnowTexture(NULL),
+             currentSeason(SEASON_GREEN), // Default Season
              currentState(MENU), running(true), p1Character(0), p2Character(1), lastPowerUpTime(0),
              gameTime(GameConstants::GAME_DURATION) {}
 
@@ -126,19 +129,33 @@ void Game::loadAssets() {
         SDL_FreeSurface(surf);
     }
 
-    // Load Background
-    surf = IMG_Load("assets/Background Snow.png");
+    // Load Environment (Green)
+    surf = IMG_Load("assets/Background Green.png");
     if (surf) {
-        backgroundTexture = SDL_CreateTextureFromSurface(renderer, surf);
+        bgGreenTexture = SDL_CreateTextureFromSurface(renderer, surf);
+        SDL_FreeSurface(surf);
+    }
+    surf = IMG_Load("assets/Mud Tile.png");
+    if (surf) {
+        tileGreenTexture = SDL_CreateTextureFromSurface(renderer, surf);
         SDL_FreeSurface(surf);
     }
 
-    // Load Mud Tile
-    surf = IMG_Load("assets/Mud Tile Snow.png");
+    // Load Environment (Snow)
+    surf = IMG_Load("assets/Background Snow.png");
     if (surf) {
-        mudTileTexture = SDL_CreateTextureFromSurface(renderer, surf);
+        bgSnowTexture = SDL_CreateTextureFromSurface(renderer, surf);
         SDL_FreeSurface(surf);
     }
+    surf = IMG_Load("assets/Mud Tile Snow.png");
+    if (surf) {
+        tileSnowTexture = SDL_CreateTextureFromSurface(renderer, surf);
+        SDL_FreeSurface(surf);
+    }
+
+    // Set Initial Defaults
+    backgroundTexture = bgGreenTexture;
+    mudTileTexture = tileGreenTexture;
     // Background and Crystal textures removed for minimalist style
 
 }
@@ -260,8 +277,21 @@ void Game::handleEvents(SDL_Event& event) {
                         resetGame();
                         currentState = CHARACTER_SELECT;
                         // Skip lobby for local? Or go to lobby? Let's go to lobby for char select.
-                        p1Ready = false; p2Ready = false;
                         typingName = false;
+                    }
+                    if (event.key.keysym.sym == SDLK_s) {
+                         // Toggle Season
+                         if (currentSeason == SEASON_GREEN) currentSeason = SEASON_SNOW;
+                         else currentSeason = SEASON_GREEN;
+                         
+                         // Swap Pointers
+                         if (currentSeason == SEASON_SNOW) {
+                              backgroundTexture = bgSnowTexture;
+                              mudTileTexture = tileSnowTexture;
+                         } else {
+                              backgroundTexture = bgGreenTexture;
+                              mudTileTexture = tileGreenTexture;
+                         }
                     }
 
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
@@ -1167,10 +1197,14 @@ void Game::render() {
                 renderCenteredText(250, "Press H to HOST Game", {255, 255, 255, 255}, font);
                 renderCenteredText(300, "Press J to JOIN Game", {255, 255, 255, 255}, font);
                 renderCenteredText(350, "Press L for LOCAL Game", {200, 200, 200, 255}, font);
+                
+                std::string seasonStr = (currentSeason == SEASON_GREEN) ? "Season: Forest" : "Season: Arctic";
+                renderCenteredText(450, "Press S to Change Season: " + seasonStr, {100, 255, 255, 255}, font);
+                
                 if (!signalingError.empty()) {
-                    renderCenteredText(450, signalingError, {255, 0, 0, 255}, font);
+                    renderCenteredText(490, signalingError, {255, 0, 0, 255}, font);
                 }
-                renderCenteredText(490, "amphitainments", {150, 150, 150, 255}, font);
+                renderCenteredText(530, "amphitainments", {150, 150, 150, 255}, font);
             } else {
                 if (net.isHost) {
                     if (waitingForCode) {
