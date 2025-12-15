@@ -1,4 +1,4 @@
-# Amphitude
+# amphitude
 
 <div align="center">
 
@@ -17,7 +17,7 @@
 
 ## 📖 Overview
 
-**Amphitude** removes the need for central servers by implementing a custom reliable UDP protocol with **NAT Hole Punching (STUN)**. This allows players to connect directly Peer-to-Peer (P2P) across the internet with zero latency overhead from intermediate relays.
+**amphitude** removes the need for central servers by implementing a custom reliable UDP protocol with **NAT Hole Punching (STUN)**. This allows players to connect directly Peer-to-Peer (P2P) across the internet with zero latency overhead from intermediate relays.
 
 Combined with a custom physics engine and pixel-perfect rendering, it offers a raw, competitive arcade experience reminiscent of classic fighters.
 
@@ -52,7 +52,7 @@ For easier distribution, you can generate standalone installers (no compiling re
     ./packaging/create_mac_bundle.sh
     ```
 2.  Open the file in `amphitude_releases/Amphitude_Installer_Mac.dmg`.
-3.  Drag **Amphitude** to your Applications folder.
+3.  Drag **amphitude** to your Applications folder.
 
 ### 🐧 Linux (Tarball)
 1.  Run the generator script:
@@ -131,7 +131,7 @@ Run the game executable from your terminal:
 *   Select **"Local"** in the menu (Press `L`).
 
 #### 🌍 Online Play (P2P)
-Amphitude uses a unique **"Join Code"** system to bypass firewalls.
+amphitude uses a unique **"Join Code"** system to bypass firewalls.
 
 1.  **HOST**: Press `H`. The game will generate a **Public Join Code** (e.g., `157.x.x.x:50000`).
 2.  **SHARE**: Send this code to your friend via a messaging app.
@@ -181,7 +181,7 @@ Ensure you have installed the dependencies listed in the [Prerequisites](#prereq
 
 ## 🐳 Docker Support
 
-For testing Linux compatibility or simulating network scenarios on macOS, you can run Amphitude inside a Docker container.
+For testing Linux compatibility or simulating network scenarios on macOS, you can run amphitude inside a Docker container.
 
 **Prerequisites**:
 *   Docker Desktop
@@ -208,22 +208,4 @@ For testing Linux compatibility or simulating network scenarios on macOS, you ca
 *   **Protocol**:
     *   `OpCode 0 (PUNCH)`: NAT keep-alive and hole punching.
     *   `OpCode 1 (INPUT)`: Client input transmission.
-    *   `OpCode 2 (STATE)`: Host authoritative state updates (compressed).
-
-### File Structure
-```
-amphitude/
-├── src/            # Source files (Game.cpp, NetworkManager.cpp...)
-├── include/        # Header files
-├── assets/         # Sprites and Fonts
-├── Dockerfile      # Debian-based build environment
-└── build.sh        # Cross-platform build script
-```
-
----
-
-## 📄 License
-
-This project is licensed under the **GNU General Public License v2.0 (GPLv2)** - see the [LICENSE](LICENSE) file for details.
-
-Copyright © 2025 **Amphitainments**
+4.  **

@@ -38,7 +38,7 @@ bool Game::init() {
     }
 
     // Create the game window
-    window = SDL_CreateWindow("Amphitude",
+    window = SDL_CreateWindow("amphitude",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window) return false;
