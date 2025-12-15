@@ -208,4 +208,24 @@ For testing Linux compatibility or simulating network scenarios on macOS, you ca
 *   **Protocol**:
     *   `OpCode 0 (PUNCH)`: NAT keep-alive and hole punching.
     *   `OpCode 1 (INPUT)`: Client input transmission.
-4.  **
+    *   `OpCode 2 (STATE)`: Host authoritative state updates (compressed).
+
+### File Structure
+```
+amphitude/
+├── src/            # Source files (Game.cpp, NetworkManager.cpp...)
+├── include/        # Header files
+├── assets/         # Sprites and Fonts
+├── packaging/      # Installers scripts
+├── amphitude_releases/ # Generated installers
+└── build.sh        # Smart Build Script
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **GNU General Public License v2.0 (GPLv2)** - see the [LICENSE](LICENSE) file for details.
+
+**Copyright © 2025 amphitainments**
+Moved by the spirit of retro gaming. 🕹️
