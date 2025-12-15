@@ -42,7 +42,29 @@ Combined with a custom physics engine and pixel-perfect rendering, it offers a r
 
 ---
 
-## 🛠 Building & Installation
+## � Download & Installers
+
+For easier distribution, you can generate standalone installers (no compiling required for end-users):
+
+### 🍎 macOS (DMG)
+1.  Run the generator script:
+    ```bash
+    ./packaging/create_mac_bundle.sh
+    ```
+2.  Open the file in `amphitude_releases/Amphitude_Installer_Mac.dmg`.
+3.  Drag **Amphitude** to your Applications folder.
+
+### 🐧 Linux (Tarball)
+1.  Run the generator script:
+    ```bash
+    ./packaging/create_linux_bundle.sh
+    ```
+2.  Extract `amphitude_releases/Amphitude_Linux.tar.gz`.
+3.  Run `./run.sh` to launch the game.
+
+---
+
+## �🛠 Building & Installation
 
 ### Prerequisites
 
