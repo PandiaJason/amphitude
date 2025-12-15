@@ -127,14 +127,14 @@ void Game::loadAssets() {
     }
 
     // Load Background
-    surf = IMG_Load("assets/Background Green.png");
+    surf = IMG_Load("assets/Background Snow.png");
     if (surf) {
         backgroundTexture = SDL_CreateTextureFromSurface(renderer, surf);
         SDL_FreeSurface(surf);
     }
 
     // Load Mud Tile
-    surf = IMG_Load("assets/Mud Tile.png");
+    surf = IMG_Load("assets/Mud Tile Snow.png");
     if (surf) {
         mudTileTexture = SDL_CreateTextureFromSurface(renderer, surf);
         SDL_FreeSurface(surf);
@@ -1255,13 +1255,32 @@ void Game::render() {
         } else {
              // ... Normal Lobby UI ...
              // Player 1 Section (Left)
+             SDL_Texture* p1PreviewTex = (p1Character == 0) ? boyTexture : girlTexture;
+             int p1W = (p1Character == 0) ? boyW : girlW;
+             int p1H = (p1Character == 0) ? boyH : girlH;
+             
+             // Draw Preview Sprite (Frame 0: Idle)
+             SDL_Rect p1Src = {0, 0, p1W/6, p1H/3};
+             SDL_Rect p1Dst = {100, 50, (p1W/6)*2, (p1H/3)*2}; // Scale 2x
+             SDL_RenderCopy(renderer, p1PreviewTex, &p1Src, &p1Dst);
+
              std::string p1Str = (p1Character == 0) ? "< Boy >" : "< Girl >";
              renderText(100, 150, "Player 1 (Host)", {0, 255, 255, 255}, font);
              renderText(100, 200, p1Str, {255, 255, 255, 255}, font);
              renderText(100, 250, "Name: " + p1NameInput + (typingName && (isOnline ? net.isHost : true) ? "_" : ""), {255, 255, 255, 255}, font);
              renderText(100, 300, p1Ready ? "READY!" : "Not Ready", p1Ready ? SDL_Color{0, 255, 0, 255} : SDL_Color{255, 0, 0, 255}, font);
-             
+
              // Player 2 Section (Right)
+             SDL_Texture* p2PreviewTex = (p2Character == 0) ? boyTexture : girlTexture;
+             int p2W = (p2Character == 0) ? boyW : girlW;
+             int p2H = (p2Character == 0) ? boyH : girlH;
+
+             // Draw Preview Sprite (Frame 0: Idle)
+             SDL_Rect p2Src = {0, 0, p2W/6, p2H/3};
+             SDL_Rect p2Dst = {500, 50, (p2W/6)*2, (p2H/3)*2}; // Scale 2x
+             // Flip Player 2? Usually facing left.
+             SDL_RenderCopyEx(renderer, p2PreviewTex, &p2Src, &p2Dst, 0, NULL, SDL_FLIP_HORIZONTAL);
+
              std::string p2Str = (p2Character == 0) ? "< Boy >" : "< Girl >";
              renderText(500, 150, "Player 2 (Client)", {255, 100, 100, 255}, font);
              renderText(500, 200, p2Str, {255, 255, 255, 255}, font);
