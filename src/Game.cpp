@@ -1140,12 +1140,26 @@ void Game::update() {
     particles.erase(std::remove_if(particles.begin(), particles.end(),
         [](const Particle& p) { return !p.active; }), particles.end());
 
+    // Win/Loss Condition (HP <= 0)
+    if (players[0].hp <= 0) {
+        winnerId = 2;
+        currentState = GAMEOVER;
+    } else if (players[1].hp <= 0) {
+        winnerId = 1;
+        currentState = GAMEOVER;
+    }
+
     // Timer Logic
     if (gameTime > 0) {
         gameTime -= 1.0f / 60.0f; // Assuming 60 FPS
         if (gameTime <= 0) {
             gameTime = 0;
             currentState = GAMEOVER;
+            
+            // Time Out: Player with Higher HP Wins
+            if (players[0].hp > players[1].hp) winnerId = 1;
+            else if (players[1].hp > players[0].hp) winnerId = 2;
+            else winnerId = 0; // Draw
         }
     }
 
